@@ -23,7 +23,6 @@ LISTEN_ADDRESS=10.29.2.1:12345 go run apiServer/apiServer.go &
 LISTEN_ADDRESS=10.29.2.2:12345 go run apiServer/apiServer.go &
 
 
-# ./tools/startTestEnv.sh chapter3
-
+# ./tools/startTestEnv.sh
 
 
