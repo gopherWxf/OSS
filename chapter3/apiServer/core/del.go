@@ -19,7 +19,7 @@ func del(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	//向es中插入object一个版本，size=0,hash=""，代表着是插入标记
+	//向es中插入object一个版本，size=0,hash=""，标志着删除
 	v, _ := strconv.Atoi(version.Version)
 	err = es.PutMetadata(object, v+1, 0, "")
 	if err != nil {

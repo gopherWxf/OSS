@@ -1,5 +1,16 @@
 package versions
 
+/*
+	http://apiServerIP/versions/
+	这种形式的url相应过来
+	PUT:
+		获取所有元数据信息
+		metas, err := es.SearchAllVersions(object, from, size)
+		将信息写入到response响应中
+		bytes, _ := json.Marshal(metas[i])
+		w.Write(bytes)
+		w.Write([]byte("\n"))
+*/
 import (
 	es "ceph/chapter3/lib/ElasticSearch"
 	"encoding/json"

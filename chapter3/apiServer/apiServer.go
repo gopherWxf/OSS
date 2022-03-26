@@ -25,8 +25,8 @@ func main() {
 	//http://apiServerIP/locate/<xxx>
 	http.HandleFunc("/locate/", locate.Handler)
 
-	//REST接口 主要是找到<xxx>存在于哪个数据节点
-	//http://apiServerIP/versions/<xxx>
+	//REST接口 获取所有对象的版本信息
+	//http://apiServerIP/versions/
 	http.HandleFunc("/versions/", versions.Handler)
 
 	fmt.Println(os.Getenv("LISTEN_ADDRESS"), "===>apiServer Start running <===")

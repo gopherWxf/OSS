@@ -13,7 +13,10 @@ package core
 		向数据节点发送GET请求，将请求出来的res.body作为一个reader流
 		将流中的内容写入到原来的请求里面去作为响应
 	如果是DEL:
-		//TODO
+		首先先去获取对象的最新版本信息
+		version, err := es.SearchLatestVersion(object)
+		es中插入一个新版本版本，size=0,hash=""，标志着删除
+		es.PutMetadata(object, v+1, 0, "")
 */
 import "net/http"
 
