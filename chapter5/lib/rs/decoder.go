@@ -9,8 +9,8 @@ type decoder struct {
 	readers   []io.Reader
 	writers   []io.Writer
 	enc       reedsolomon.Encoder
-	size      int64 //对象的大小
-	cache     []byte
+	size      int64  //对象的大小
+	cache     []byte //缓存读取的数据
 	cacheSize int
 	total     int64 //表示已读多少字节
 }
@@ -56,11 +56,11 @@ func (d *decoder) getData() error {
 	//修复分片
 	repairIds := make([]int, 0)
 	for i := range shards {
-		//如果是nil，说明数据丢失
+		//如果是nil，说明数据丢失，存入待恢复数组
 		if d.readers[i] == nil {
 			repairIds = append(repairIds, i)
 		} else {
-			//读取数据
+			//读取流正常，读取数据
 			shards[i] = make([]byte, BLOCK_PER_SHARD)
 			n, err := io.ReadFull(d.readers[i], shards[i])
 			//如果发生非EOF失败，则将shards置为nil
@@ -73,6 +73,7 @@ func (d *decoder) getData() error {
 	}
 	//尝试将nil的shards恢复
 	err := d.enc.Reconstruct(shards)
+	//如果这一步错误，说明对象不可被修复了
 	if err != nil {
 		return err
 	}

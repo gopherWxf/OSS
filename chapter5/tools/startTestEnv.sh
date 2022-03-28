@@ -1,12 +1,12 @@
 
 
 # 初始化文件目录
-for i in `seq 1 6`
-do
-    mkdir -p C:/tmp/$i/objects
-    mkdir -p C:/tmp/$i/temp
-    mkdir -p C:/tmp/$i/garbage
-done
+#for i in `seq 1 6`
+#do
+#    mkdir -p C:/tmp/$i/objects
+#    mkdir -p C:/tmp/$i/temp
+#    mkdir -p C:/tmp/$i/garbage
+#done
 
 # 启动程序
 export RABBITMQ_SERVER=amqp://test:test@localhost:5672

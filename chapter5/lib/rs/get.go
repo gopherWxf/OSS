@@ -11,7 +11,7 @@ type RSGetStream struct {
 }
 
 func NewRSGetStream(locateInfo map[int]string, dataServers []string, hash string, size int64) (*RSGetStream, error) {
-	//检查是否满足4+2 RS码的要求
+	//检查是否满足4+2 RS码的要求，不满足则返回错误
 	if len(locateInfo)+len(dataServers) != ALL_SHARDS {
 		return nil, fmt.Errorf("dataServers number mismatch")
 	}
@@ -26,11 +26,13 @@ func NewRSGetStream(locateInfo map[int]string, dataServers []string, hash string
 		}
 		//如果存在，则打开一个对象读取流用于读取分片数据
 		reader, err := objectStream.NewGetStream(server, fmt.Sprintf("%s.%d", hash, i))
+		//会有一种情况导致err,readers[i]=nil , 对象读取流打开失败
 		if err == nil {
 			readers[i] = reader
 		}
 	}
 	writers := make([]io.Writer, ALL_SHARDS)
+	//计算每个分片的大小
 	perShard := (size + DATA_SHARDS - 1) / DATA_SHARDS
 	var err error
 	for i := range readers {
@@ -42,6 +44,7 @@ func NewRSGetStream(locateInfo map[int]string, dataServers []string, hash string
 			}
 		}
 	}
+	//处理完成后，readers和writers数组形成互补的关系，对于某个分片id来说，要么在reader读取流，要么在writer写入流
 	dec := NewDecoder(readers, writers, size)
 	return &RSGetStream{dec}, nil
 }

@@ -37,7 +37,7 @@ func StartLocate() {
 		if err != nil {
 			panic(err)
 		}
-		//如果Locate返回true,则说明本地有这个文件,则将这个消息写入dataServers
+		//如果Locate返回！=-1,则说明本地有这个文件,则将这个消息写入dataServers
 		id := Locate(hash)
 		if id != -1 {
 			r.Send(msg.ReplyTo, types.LocateMessage{
@@ -51,7 +51,7 @@ func StartLocate() {
 var objects = make(map[string]int)
 var mutex sync.Mutex
 
-//查看本地是否有这个文件
+//查看本地是否有这个文件，并且告知本节点存储的是该对象的哪个分片
 func Locate(hash string) int {
 	mutex.Lock()
 	k, ok := objects[hash]

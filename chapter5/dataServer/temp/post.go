@@ -19,7 +19,7 @@ import (
 //记录临时对象的uuid，名字和大小
 type tempInfo struct {
 	Uuid string
-	Name string
+	Name string //hashAndId
 	Size int64
 }
 

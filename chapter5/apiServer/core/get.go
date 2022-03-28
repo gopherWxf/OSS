@@ -52,23 +52,30 @@ func get(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	//恢复分片的写入需要用到temp接口的转正，Close方法用于将写入恢复分片转正
-	defer stream.Close()
+
 	_, err = io.Copy(w, stream)
+	//如果发送错误，说明对象在RS解码过程中发生了错误，这对象已经无法读取了
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	//GET对象时会对切实的分片进行修复，如果没有发生错误，恢复分片的写入需要用到temp接口的转正，Close方法用于将写入恢复分片转正
+	stream.Close()
 }
 
 //获取object文件的读取流
+/*
+	增加size参数是因为RS码的实现要求每一个数据片的长度完全一样，在编码时如果对象长度不能被4整除
+	函数会对最后一个数据片进行填充。依次在解码时必须提供对象的准确长度，防止填充数据当初原始对象数据返回
+*/
 func getStream(hash string, size int64) (*rs.RSGetStream, error) {
 	//查找哪几台数据节点存了该object的数据分片
 	locateInfo, err := locate.Locate(hash)
 	if err != nil {
 		return nil, err
 	}
+	//如果小于4，说明数据不完整，返回错误
 	if len(locateInfo) < rs.DATA_SHARDS {
 		return nil, fmt.Errorf("object %s locate fail,result %v", hash, locateInfo)
 	}

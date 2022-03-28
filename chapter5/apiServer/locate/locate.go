@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//判断收到的数据分片是否大于等于要求，true则说明对象存在
+//判断收到的数据分片是否大于等于要求，即判断收到的反馈消息数量是否大于等于4
 func Exist(hash string) bool {
 	locateinfo, _ := Locate(hash)
 	return len(locateinfo) >= rs.DATA_SHARDS
@@ -38,8 +38,13 @@ func Locate(hash string) (locateInfo map[int]string, err error) {
 		if len(string(msg.Body)) == 0 {
 			return nil, errors.New("msg.Body an error occurred, no message")
 		}
+		//type LocateMessage struct {
+		//	Addr string
+		//	Id   int
+		//}
 		var info types.LocateMessage
 		json.Unmarshal(msg.Body, &info)
+		//将获取到的分片id和节点地址存进map中返回
 		locateInfo[info.Id] = info.Addr
 	}
 	return

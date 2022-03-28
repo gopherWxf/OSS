@@ -18,7 +18,7 @@ func NewRSPutStream(dataServers []string, hash string, size int64) (*RSPutStream
 	if len(dataServers) != ALL_SHARDS {
 		return nil, errors.New("dataServers number mismatch")
 	}
-	//分片大小
+	//perShard:根据size计算每个分片的大小
 	perShard := (size + DATA_SHARDS - 1) / DATA_SHARDS
 	writers := make([]io.Writer, ALL_SHARDS)
 	var err error

@@ -71,11 +71,11 @@ func (r *GetStream) Read(p []byte) (n int, err error) {
 }
 
 //创建一个读取流，这里设计newGetStream的目的是通过检查两个参数，隐藏内部细节，不导出
-func NewGetStream(serverAddr, objectName string) (*GetStream, error) {
-	if serverAddr == "" || objectName == "" {
-		return nil, fmt.Errorf("invalid server %s object %s", serverAddr, objectName)
+func NewGetStream(serverAddr, hashAndId string) (*GetStream, error) {
+	if serverAddr == "" || hashAndId == "" {
+		return nil, fmt.Errorf("invalid server %s hashAndId %s", serverAddr, hashAndId)
 	}
-	return newGetStream("http://" + serverAddr + "/objects/" + objectName)
+	return newGetStream("http://" + serverAddr + "/objects/" + hashAndId)
 }
 func newGetStream(url string) (*GetStream, error) {
 	res, err := http.Get(url)
@@ -95,8 +95,8 @@ type TempPutStream struct {
 }
 
 //创建临时对象,对于数据服务节点来说，hash值是对象名，这样可以实现去重
-func NewTempPutStream(server, hash string, size int64) (*TempPutStream, error) {
-	request, err := http.NewRequest("POST", "http://"+server+"/temp/"+hash, nil)
+func NewTempPutStream(server, hashAndId string, size int64) (*TempPutStream, error) {
+	request, err := http.NewRequest("POST", "http://"+server+"/temp/"+hashAndId, nil)
 	if err != nil {
 		return nil, err
 	}
