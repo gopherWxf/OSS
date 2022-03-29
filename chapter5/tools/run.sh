@@ -21,3 +21,5 @@ curl -v 10.29.2.1:12345/objects/test5 -XPUT -d "this is object test5" -H "Digest
 echo -n "this is object test4" | openssl dgst -sha256 -binary | base64
 
 curl -v 10.29.2.1:12345/objects/test5 -XDELETE
+
+curl -v 10.29.2.1:12345/locate/B494C1vj+98Y+PTGRiNqWu7gRgWQwiHnEofa47sN6mk=
