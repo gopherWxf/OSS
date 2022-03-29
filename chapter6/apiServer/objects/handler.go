@@ -1,4 +1,4 @@
-package core
+package objects
 
 /*
 	http://apiServerIP/objects/<xxx>

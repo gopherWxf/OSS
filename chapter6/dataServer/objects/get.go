@@ -1,4 +1,4 @@
-package core
+package objects
 
 import (
 	"ceph/chapter6/dataServer/locate"

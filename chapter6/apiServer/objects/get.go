@@ -1,4 +1,4 @@
-package core
+package objects
 
 import (
 	"ceph/chapter6/apiServer/heartbeat"
@@ -79,7 +79,6 @@ func get(w http.ResponseWriter, r *http.Request) {
 */
 func getStream(hash string, size int64) (*rs.RSGetStream, error) {
 	//查找哪几台数据节点存了该object的数据分片
-	fmt.Println(hash)
 	locateInfo, err := locate.Locate(hash)
 	if err != nil {
 		return nil, err

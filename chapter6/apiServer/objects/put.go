@@ -1,4 +1,4 @@
-package core
+package objects
 
 import (
 	"ceph/chapter6/apiServer/heartbeat"
@@ -53,7 +53,7 @@ func storeObject(r io.Reader, hash string, size int64) (int, error) {
 	if locate.Exist(url.PathEscape(hash)) {
 		return http.StatusOK, nil
 	}
-	//随机选择一个数据节点创建一个输入流
+	//随机选择多个数据节点创建一个输入流
 	stream, err := putStream(url.PathEscape(hash), size)
 	if err != nil {
 		return http.StatusServiceUnavailable, err

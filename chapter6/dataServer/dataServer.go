@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ceph/chapter6/dataServer/core"
 	"ceph/chapter6/dataServer/heartbeat"
 	"ceph/chapter6/dataServer/locate"
+	"ceph/chapter6/dataServer/objects"
 	"ceph/chapter6/dataServer/temp"
 	"fmt"
 	"log"
@@ -23,7 +23,7 @@ func main() {
 
 	//REST接口 主要是GET和PUT
 	//http://ip/objects/<xxx>
-	http.HandleFunc("/objects/", core.Handler)
+	http.HandleFunc("/objects/", objects.Handler)
 
 	//REST接口 主要是PUT,PATCH,POST,DEL
 	//http://ip/temp/

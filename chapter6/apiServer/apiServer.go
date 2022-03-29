@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ceph/chapter6/apiServer/core"
 	"ceph/chapter6/apiServer/heartbeat"
 	"ceph/chapter6/apiServer/locate"
+	"ceph/chapter6/apiServer/objects"
 	"ceph/chapter6/apiServer/temp"
 	"ceph/chapter6/apiServer/versions"
 	"fmt"
@@ -21,7 +21,7 @@ func main() {
 	//REST接口 主要是GET和PUT
 	//http://apiServerIP/objects/<xxx>  这里的<xxx>是对象名
 	//http://apiServerIP/objects/<xxx>？version=n
-	http.HandleFunc("/objects/", core.Handler)
+	http.HandleFunc("/objects/", objects.Handler)
 
 	//REST接口 主要是找到<xxx>存在于哪个数据节点
 	//http://apiServerIP/locate/<xxx>   这里的<xxx>是hash值

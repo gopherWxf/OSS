@@ -1,4 +1,4 @@
-package core
+package objects
 
 import (
 	es "ceph/chapter6/lib/ElasticSearch"
@@ -17,6 +17,11 @@ func del(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if version.Version == "" {
+		log.Println("Not found", object)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	//向es中插入object一个版本，size=0,hash=""，代表着是插入标记

@@ -9,6 +9,7 @@ import (
 )
 
 func head(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	token := strings.Split(r.URL.EscapedPath(), "/")[2]
 	stream, err := rs.NewRSResumablePutStreamFromToken(token)
 	if err != nil {
@@ -16,6 +17,7 @@ func head(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
+	//获取数据节点已经储存该对象多少数据了
 	current := stream.CurrentSize()
 	if current == -1 {
 		w.WriteHeader(http.StatusNotFound)

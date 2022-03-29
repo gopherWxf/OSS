@@ -5,7 +5,6 @@ import (
 	es "ceph/chapter6/lib/ElasticSearch"
 	"ceph/chapter6/lib/rs"
 	"ceph/chapter6/utils"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -24,7 +23,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	//获得token当前大小，如果为-1则说明不存在
+	//获取数据节点已经储存该对象多少数据了
 	current := stream.CurrentSize()
 	if current == -1 {
 		w.WriteHeader(http.StatusNotFound)
@@ -37,7 +36,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
 		return
 	}
-	//如果一致，则在for循环中以32000字节长度读取正文并写入stream
+	//如果一致，则在for循环中以32000字节长度读取正文并写入stream,分块
 	bytes := make([]byte, rs.BLOCK_SIZE)
 	for {
 		n, err := io.ReadFull(r.Body, bytes)
@@ -55,8 +54,9 @@ func put(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
-		//如果本次读取的长度不到32000字节且读到的总长都不等于对象的大小，说明客户端本次上传结束
-		//后续还有数据需要上传，此时接口服务会丢弃最后那次读取的长度不到32000字节的数据
+		//n != rs.BLOCK_SIZE：说明本次客户端的数据已经传完了
+		//current != stream.Size：说明对象的整体数据还没有完全传输完
+		//此时接口服务会丢弃这次读取的长度不到32000字节的数据
 		if n != rs.BLOCK_SIZE && current != stream.Size {
 			return
 		}
@@ -67,8 +67,6 @@ func put(w http.ResponseWriter, r *http.Request) {
 			stream.Flush()
 			//调用rs.NewRSResumableGetStream生成一个临时对象读取流
 			getStream, _ := rs.NewRSResumableGetStream(stream.Servers, stream.Uuids, stream.Size)
-			fmt.Println(stream.Servers)
-			fmt.Println(stream.Uuids)
 			//读取流中的数据并计算hash值
 			hash := url.PathEscape(utils.CalculateHash(getStream))
 			//如果hash值不一致，则说明数据有误，删除临时对象
@@ -79,7 +77,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			//如果hash一致，检查是否已经存在，存在则删除，不存在则转正
-			if locate.Exist(url.PathEscape(hash)) {
+			if locate.Exist(hash) {
 				stream.Commit(false)
 			} else {
 				stream.Commit(true)

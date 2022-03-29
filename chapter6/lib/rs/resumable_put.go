@@ -77,7 +77,7 @@ func NewRSResumablePutStreamFromToken(ftoken string) (*RSResumablePutStream, err
 	}, nil
 }
 
-//获取当前已存储的大小
+//获取数据节点已经储存该对象多少数据了
 func (rsr *RSResumablePutStream) CurrentSize() int64 {
 	//以head方法获取第一个分片临时对象的大小
 	res, err := http.Head(fmt.Sprintf("http://%s/temp/%s", rsr.Servers[0], rsr.Uuids[0]))

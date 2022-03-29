@@ -1,4 +1,4 @@
-package core
+package objects
 
 /*
 	http://dataServerIP/objects/<xxx>
