@@ -1,2 +1,0 @@
-# ceph
-Distributed storage system
