@@ -1,4 +1,4 @@
-module ceph
+module OSS
 
 go 1.17
 
