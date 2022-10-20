@@ -5,6 +5,8 @@ import (
 	"OSS/dataServer/locate"
 	"OSS/dataServer/objects"
 	"OSS/dataServer/temp"
+	RedisMQ "OSS/lib/Redis"
+	utils2 "OSS/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -30,12 +32,17 @@ func InitRouter(r *gin.Engine) {
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
+
+	utils2.Rds = RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	defer utils2.Rds.Client.Close()
+
 	//第一次启动时，将所有对象存储到map
 	locate.CollectObjects()
 	//开始发送心跳包
 	go heartbeat.StartHeartbeat()
-	//监听来自接口服务local的GET请求,查找本地是否有这个文件,有则发送消息
-	go locate.StartLocate()
+
+	////监听来自接口服务local的GET请求,查找本地是否有这个文件,有则发送消息
+	//go locate.StartLocate()
 
 	r := gin.Default()
 	InitRouter(r)

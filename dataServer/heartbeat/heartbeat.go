@@ -1,15 +1,14 @@
 package heartbeat
 
 import (
-	RedisMQ "OSS/lib/Redis"
+	"OSS/utils"
 	"os"
 	"time"
 )
 
 //开始发送心跳包
 func StartHeartbeat() {
-	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
-	defer rdb.Client.Close()
+	rdb := utils.Rds
 
 	channel := "heartbeat"
 	msg := os.Getenv("LISTEN_ADDRESS")

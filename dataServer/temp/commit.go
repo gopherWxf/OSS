@@ -1,7 +1,6 @@
 package temp
 
 import (
-	RedisMQ "OSS/lib/Redis"
 	"OSS/utils"
 	"compress/gzip"
 	"context"
@@ -30,7 +29,7 @@ func commitTempObject(dataFile string, tempinfo *tempInfo) {
 	//locate.Add(tempinfo.hash(), tempinfo.id())
 
 	//写入redis
-	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	rdb := utils.Rds
 	defer rdb.Client.Close()
 	// ZAdd Redis `ZADD key score member [score member ...]` command.
 	rdb.Client.ZAdd(context.Background(), tempinfo.hash(), &redis.Z{

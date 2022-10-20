@@ -1,6 +1,7 @@
 package utils
 
 import (
+	RedisMQ "OSS/lib/Redis"
 	"crypto/sha256"
 	"encoding/base64"
 	"io"
@@ -8,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 )
+
+var Rds *RedisMQ.RDB
 
 //获取请求头部的hash值
 func GetHashFromHeader(h http.Header) string {

@@ -6,6 +6,8 @@ import (
 	"OSS/apiServer/objects"
 	"OSS/apiServer/temp"
 	"OSS/apiServer/versions"
+	RedisMQ "OSS/lib/Redis"
+	utils2 "OSS/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -70,6 +72,10 @@ func InitRouter(r *gin.Engine) {
 }
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
+
+	utils2.Rds = RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	defer utils2.Rds.Client.Close()
+
 	//开始连接apiServers这个exchanges，将数据服务节点的地址保存起来
 	go heartbeat.ListenHeartbeat()
 

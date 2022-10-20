@@ -1,7 +1,7 @@
 package objects
 
 import (
-	RedisMQ "OSS/lib/Redis"
+	"OSS/utils"
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
@@ -60,7 +60,7 @@ func getFile(name string) string {
 	if d != hash {
 		log.Println("object hash mismatch,remove", file)
 		//locate.Del(hash)
-		rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+		rdb := utils.Rds
 		defer rdb.Client.Close()
 		rdb.RemoveFile(hash, os.Getenv("LISTEN_ADDRESS"))
 

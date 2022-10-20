@@ -1,9 +1,8 @@
 package locate
 
 import (
-	RedisMQ "OSS/lib/Redis"
 	"OSS/lib/rs"
-	"os"
+	"OSS/utils"
 )
 
 //判断收到的数据分片是否大于等于要求，即判断收到的反馈消息数量是否大于等于4
@@ -16,8 +15,7 @@ func Exist(hash string) bool {
 //locateInfo map[int]string key是分片的id，val是该分片的数据节点的地址
 func Locate(hash string) (locateInfo map[int]string, err error) {
 	//创建一个redis连接
-	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
-	defer rdb.Client.Close()
+	rdb := utils.Rds
 
 	locateInfo = make(map[int]string)
 	result, err := rdb.GetZsetIdAndIP(hash)

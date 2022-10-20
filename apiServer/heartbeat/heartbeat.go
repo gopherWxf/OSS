@@ -1,12 +1,11 @@
 package heartbeat
 
 import (
-	RedisMQ "OSS/lib/Redis"
+	"OSS/utils"
 	"context"
 	"errors"
 	"log"
 	"math/rand"
-	"os"
 	"sync"
 	"time"
 )
@@ -18,8 +17,7 @@ var mutex sync.Mutex
 //监听apiServers，将数据服务节点的地址保存起来
 func ListenHeartbeat() {
 	//创建一个redis连接
-	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
-	defer rdb.Client.Close()
+	rdb := utils.Rds
 
 	channel := "heartbeat"
 	pubsub := rdb.Subscribe(channel)

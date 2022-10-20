@@ -1,7 +1,7 @@
 package objects
 
 import (
-	RedisMQ "OSS/lib/Redis"
+	"OSS/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/url"
@@ -21,7 +21,7 @@ func Del(ctx *gin.Context) {
 		return
 	}
 	//locate.Del(hash)
-	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	rdb := utils.Rds
 	defer rdb.Client.Close()
 	rdb.RemoveFile(hash, os.Getenv("LISTEN_ADDRESS"))
 
