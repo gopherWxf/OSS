@@ -8,12 +8,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
-	"net/http"
 	"os"
 )
 
 func InitRouter(r *gin.Engine) {
-
 	//objects
 	{
 		r.GET("/objects/:name", objects.Get)
@@ -45,5 +43,6 @@ func main() {
 	fmt.Println(os.Getenv("LISTEN_ADDRESS"), "===>dataServer Start running <===")
 	//监听并启动 ip在tools中规划好了
 	//目前是10.29.1.1和10.29.1.6
-	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS"), nil))
+	log.Fatal(r.Run(os.Getenv("LISTEN_ADDRESS")))
+
 }

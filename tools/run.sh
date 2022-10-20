@@ -16,7 +16,7 @@ curl -v 10.29.2.1:12345/objects/test4 -XPUT -d "this is object test4" -H "Digest
 # 上传对象
 curl -v 10.29.2.1:12345/objects/test5 -XPUT -d "this is object test5" -H "Digest: SHA-256=B494C1vj+98Y+PTGRiNqWu7gRgWQwiHnEofa47sN6mk="
 # 查看所有版本信息
-curl -v http://10.29.2.1:12345/versions/
+curl -v http://10.29.2.1:12345/versions/all
 
 #-----------上传大对象(分批次上传)-----------#
 # 这里演示一次性上传全部

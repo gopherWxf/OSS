@@ -30,6 +30,9 @@ func Get(ctx *gin.Context) {
 	from, size := 0, 1000
 	//获取对象名
 	object := strings.Split(ctx.Request.URL.EscapedPath(), "/")[2]
+	if object == "all" {
+		object = ""
+	}
 	for {
 		//获取元数据信息
 		metas, err := es.SearchAllVersions(object, from, size)

@@ -16,6 +16,7 @@ import (
 )
 
 func Get(ctx *gin.Context) {
+	log.Println("in data server")
 	r := ctx.Request
 	w := ctx.Writer
 	defer r.Body.Close()
