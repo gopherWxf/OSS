@@ -11,7 +11,7 @@ func StartHeartbeat() {
 	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
 	defer rdb.Client.Close()
 
-	channel := "hearbeat"
+	channel := "heartbeat"
 	msg := os.Getenv("LISTEN_ADDRESS")
 
 	for {

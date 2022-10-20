@@ -36,6 +36,7 @@ func ListenHeartbeat() {
 		mutex.Lock()
 		dataServersMap[dataServerAddr] = time.Now()
 		mutex.Unlock()
+		//log.Println("recv data addr",dataServerAddr)
 	}
 }
 
