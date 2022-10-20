@@ -17,7 +17,6 @@ func Patch(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
-	log.Println("uuid", uuid)
 	//获取临时对象的信息
 	tempinfo, err := readFromFile(uuid)
 	if err != nil {
