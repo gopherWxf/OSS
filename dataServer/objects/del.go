@@ -22,7 +22,6 @@ func Del(ctx *gin.Context) {
 	}
 	//locate.Del(hash)
 	rdb := utils.Rds
-	defer rdb.Client.Close()
 	rdb.RemoveFile(hash, os.Getenv("LISTEN_ADDRESS"))
 
 	err := os.Rename(files[0], os.Getenv("STORAGE_ROOT")+"/garbage/"+filepath.Base(files[0]))

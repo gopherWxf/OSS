@@ -20,7 +20,9 @@ func Get(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
 	defer r.Body.Close()
-	file := getFile(strings.Split(r.URL.EscapedPath(), "/")[2])
+	filename := ctx.Param("id")[1:]
+	log.Println(filename)
+	file := getFile(filename)
 	if file == "" {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -61,7 +63,6 @@ func getFile(name string) string {
 		log.Println("object hash mismatch,remove", file)
 		//locate.Del(hash)
 		rdb := utils.Rds
-		defer rdb.Client.Close()
 		rdb.RemoveFile(hash, os.Getenv("LISTEN_ADDRESS"))
 
 		err := os.Remove(file)

@@ -25,7 +25,7 @@ LISTEN_ADDRESS=10.29.2.2:12345 go run apiServer/apiServer.go &
 
 go run webServer/webServer.go
 
-# ./tools/startTestEnv.sh chapter10
+# ./tools/startTestEnv.sh
 # export API_SERVER=10.29.2.1:12345
 
 

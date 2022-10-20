@@ -27,6 +27,7 @@ func Put(ctx *gin.Context) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	log.Println("put hash:", hash)
 	//获取内容的大小
 	size := utils.GetSizeFromHeader(r.Header)
 	//将hash值作为数据节点存储文件的名称，实现对象名与内容的解耦

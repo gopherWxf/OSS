@@ -30,7 +30,7 @@ func commitTempObject(dataFile string, tempinfo *tempInfo) {
 
 	//写入redis
 	rdb := utils.Rds
-	defer rdb.Client.Close()
+
 	// ZAdd Redis `ZADD key score member [score member ...]` command.
 	rdb.Client.ZAdd(context.Background(), tempinfo.hash(), &redis.Z{
 		Score:  float64(tempinfo.id()),
