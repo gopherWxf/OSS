@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
+	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
@@ -14,7 +15,9 @@ import (
 	"strings"
 )
 
-func get(w http.ResponseWriter, r *http.Request) {
+func Get(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
 	defer r.Body.Close()
 	file := getFile(strings.Split(r.URL.EscapedPath(), "/")[2])
 	if file == "" {

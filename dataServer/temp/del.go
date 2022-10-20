@@ -5,12 +5,14 @@ package temp
 */
 import (
 	"fmt"
-	"net/http"
+	"github.com/gin-gonic/gin"
 	"os"
 	"strings"
 )
 
-func del(w http.ResponseWriter, r *http.Request) {
+func Del(ctx *gin.Context) {
+	r := ctx.Request
+
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	fmt.Println(uuid, "remove")
 	infoFile := os.Getenv("STORAGE_ROOT") + "/temp/" + uuid

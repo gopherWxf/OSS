@@ -4,13 +4,16 @@ package temp
 	转正，将$STORAGE_ROOT/temp/t.Uuid.dat 改为 $STORAGE_ROOT/objects/hash
 */
 import (
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 )
 
-func put(w http.ResponseWriter, r *http.Request) {
+func Put(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	tempinfo, err := readFromFile(uuid)
 	if err != nil {

@@ -6,14 +6,32 @@ import (
 	"OSS/dataServer/objects"
 	"OSS/dataServer/temp"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
 )
 
+func InitRouter(r *gin.Engine) {
+
+	//objects
+	{
+		r.GET("/objects", objects.Get)
+		r.DELETE("/objects", objects.Del)
+	}
+	//temp
+	{
+		r.PUT("/temp", temp.Put)
+		r.PATCH("/temp", temp.Patch)
+		r.POST("/temp", temp.Post)
+		r.DELETE("/temp", temp.Del)
+		r.HEAD("/temp", temp.Head)
+		r.GET("/temp", temp.Get)
+	}
+}
+
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
-
 	//第一次启动时，将所有对象存储到map
 	locate.CollectObjects()
 	//开始发送心跳包
@@ -21,13 +39,8 @@ func main() {
 	//监听来自接口服务local的GET请求,查找本地是否有这个文件,有则发送消息
 	go locate.StartLocate()
 
-	//REST接口 主要是GET和PUT
-	//http://ip/objects/<xxx>
-	http.HandleFunc("/objects/", objects.Handler)
-
-	//REST接口 主要是PUT,PATCH,POST,DEL
-	//http://ip/temp/
-	http.HandleFunc("/temp/", temp.Handler)
+	r := gin.Default()
+	InitRouter(r)
 
 	fmt.Println(os.Getenv("LISTEN_ADDRESS"), "===>dataServer Start running <===")
 	//监听并启动 ip在tools中规划好了

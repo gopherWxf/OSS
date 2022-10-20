@@ -5,6 +5,7 @@ package temp
 */
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
@@ -12,7 +13,9 @@ import (
 	"strings"
 )
 
-func patch(w http.ResponseWriter, r *http.Request) {
+func Patch(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	//获取临时对象的信息
 	tempinfo, err := readFromFile(uuid)

@@ -3,14 +3,16 @@ package objects
 import (
 	"OSS/dataServer/locate"
 	"fmt"
-	"net/http"
+	"github.com/gin-gonic/gin"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func del(w http.ResponseWriter, r *http.Request) {
+func Del(ctx *gin.Context) {
+	r := ctx.Request
+
 	//获取hash
 	object := strings.Split(r.URL.EscapedPath(), "/")[2]
 	hash := url.PathEscape(object)

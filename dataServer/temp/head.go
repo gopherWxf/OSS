@@ -2,13 +2,16 @@ package temp
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 )
 
-func head(w http.ResponseWriter, r *http.Request) {
+func Head(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	file, err := os.Open(os.Getenv("STORAGE_ROOT") + "/temp/" + uuid + ".dat")
 	if err != nil {

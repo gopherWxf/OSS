@@ -8,6 +8,7 @@ package temp
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"log"
 	"net/http"
@@ -23,7 +24,9 @@ type tempInfo struct {
 	Size int64
 }
 
-func post(w http.ResponseWriter, r *http.Request) {
+func Post(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
 	/*
 		//windows下没有uuidgen的命令，这里使用google/uuid
 		output, err := exec.Command("uuidgen").Output()
