@@ -1,9 +1,11 @@
 package temp
 
 import (
-	"OSS/dataServer/locate"
+	RedisMQ "OSS/lib/Redis"
 	"OSS/utils"
 	"compress/gzip"
+	"context"
+	"github.com/go-redis/redis/v8"
 	"io"
 	"net/url"
 	"os"
@@ -24,7 +26,17 @@ func commitTempObject(dataFile string, tempinfo *tempInfo) {
 	//最后删除临时文件，添加缓存定位即可
 	file.Close()
 	os.Remove(dataFile)
-	locate.Add(tempinfo.hash(), tempinfo.id())
+
+	//locate.Add(tempinfo.hash(), tempinfo.id())
+
+	//写入redis
+	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	defer rdb.Client.Close()
+	// ZAdd Redis `ZADD key score member [score member ...]` command.
+	rdb.Client.ZAdd(context.Background(), tempinfo.hash(), &redis.Z{
+		Score:  float64(tempinfo.id()),
+		Member: os.Getenv("LISTEN_ADDRESS"),
+	})
 }
 func (t *tempInfo) hash() string {
 	s := strings.Split(t.Name, ".")

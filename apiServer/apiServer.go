@@ -49,23 +49,23 @@ func InitRouter(r *gin.Engine) {
 
 	//objects
 	{
-		r.PUT("/objects/:name", objects.Put)
-		r.GET("/objects/:name", objects.Get)
-		r.DELETE("/objects/:name", objects.Del)
-		r.POST("/objects/:name", objects.Post)
+		r.PUT("/objects/*id", objects.Put)
+		r.GET("/objects/*id", objects.Get)
+		r.DELETE("/objects/*id", objects.Del)
+		r.POST("/objects/*id", objects.Post)
 	}
 	//locate
 	{
-		r.GET("/locate/:name", locate.Get)
+		r.GET("/locate/*id", locate.Get)
 	}
 	//versions
 	{
-		r.GET("/versions/:name", versions.Get)
+		r.GET("/versions/*id", versions.Get)
 	}
 	//temp
 	{
-		r.HEAD("/temp/:name", temp.Head)
-		r.PUT("/temp/:name", temp.Put)
+		r.HEAD("/temp/*id", temp.Head)
+		r.PUT("/temp/*id", temp.Put)
 	}
 }
 func main() {

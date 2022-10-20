@@ -16,7 +16,11 @@ package locate
 */
 import (
 	"OSS/lib/RabbitMQ"
+	RedisMQ "OSS/lib/Redis"
 	"OSS/lib/types"
+	"context"
+	"github.com/go-redis/redis/v8"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -79,6 +83,10 @@ func Del(hash string) {
 func CollectObjects() {
 	//读取$STORAGE_ROOT/objects/目录里的所有文件
 	files, _ := filepath.Glob(os.Getenv("STORAGE_ROOT") + "/objects/*")
+	//写入redis
+	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	defer rdb.Client.Close()
+	t := ""
 	for i := range files {
 		//对这些文件调用filepath.Base获取基本文件名
 		file := strings.Split(filepath.Base(files[i]), ".")
@@ -90,6 +98,18 @@ func CollectObjects() {
 		if err != nil {
 			panic(err)
 		}
-		objects[hash] = id
+		t = hash
+		//objects[hash] = id
+
+		// ZAdd Redis `ZADD key score member [score member ...]` command.
+		err = rdb.Client.ZAdd(context.Background(), hash, &redis.Z{
+			Score:  float64(id),
+			Member: os.Getenv("LISTEN_ADDRESS"),
+		}).Err()
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println(hash, float64(id), os.Getenv("LISTEN_ADDRESS"))
 	}
+	rdb.GetZsetIdAndIP(t)
 }

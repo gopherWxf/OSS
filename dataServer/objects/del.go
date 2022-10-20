@@ -1,7 +1,7 @@
 package objects
 
 import (
-	"OSS/dataServer/locate"
+	RedisMQ "OSS/lib/Redis"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/url"
@@ -20,7 +20,11 @@ func Del(ctx *gin.Context) {
 	if len(files) != 1 {
 		return
 	}
-	locate.Del(hash)
+	//locate.Del(hash)
+	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	defer rdb.Client.Close()
+	rdb.RemoveFile(hash, os.Getenv("LISTEN_ADDRESS"))
+
 	err := os.Rename(files[0], os.Getenv("STORAGE_ROOT")+"/garbage/"+filepath.Base(files[0]))
 	if err != nil {
 		fmt.Println("rename err", err)

@@ -44,5 +44,4 @@ func main() {
 	//监听并启动 ip在tools中规划好了
 	//目前是10.29.1.1和10.29.1.6
 	log.Fatal(r.Run(os.Getenv("LISTEN_ADDRESS")))
-
 }
