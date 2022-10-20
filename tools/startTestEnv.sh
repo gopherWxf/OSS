@@ -11,6 +11,7 @@ done
 # 启动程序
 export RABBITMQ_SERVER=amqp://test:test@localhost:5672
 export ES_SERVER=localhost:9200
+export REDIS_SERVER=101.43.17.240:6379
 
 LISTEN_ADDRESS=10.29.1.1:12345 STORAGE_ROOT=C:/tmp/1 go run dataServer/dataServer.go &
 LISTEN_ADDRESS=10.29.1.2:12345 STORAGE_ROOT=C:/tmp/2 go run dataServer/dataServer.go &

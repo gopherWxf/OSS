@@ -1,20 +1,23 @@
 package heartbeat
 
 import (
-	"OSS/lib/RabbitMQ"
+	RedisMQ "OSS/lib/Redis"
 	"os"
 	"time"
 )
 
 //开始发送心跳包
 func StartHeartbeat() {
-	//创建一个rabbitmq结构体的实例
-	r := RabbitMQ.NewRabbitMQ(os.Getenv("RABBITMQ_SERVER"))
-	defer r.Close()
+	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	defer rdb.Client.Close()
+
+	channel := "hearbeat"
+	msg := os.Getenv("LISTEN_ADDRESS")
+
 	for {
 		//将LISTEN_ADDRESS对应的val,即本地地址发送到apiServers里去
-		//所有绑定apiServers这个exchange的RabbitMQ都会收到这个消息
-		r.Publish("apiServers", os.Getenv("LISTEN_ADDRESS"))
-		time.Sleep(5 * time.Second)
+		//所有绑定apiServers这个pubsub的redis都会收到这个消息
+		rdb.Publish(channel, msg)
+		time.Sleep(time.Second * 5)
 	}
 }

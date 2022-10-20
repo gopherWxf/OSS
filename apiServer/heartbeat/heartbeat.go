@@ -1,11 +1,12 @@
 package heartbeat
 
 import (
-	"OSS/lib/RabbitMQ"
+	RedisMQ "OSS/lib/Redis"
+	"context"
 	"errors"
+	"log"
 	"math/rand"
 	"os"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -16,19 +17,22 @@ var mutex sync.Mutex
 
 //监听apiServers，将数据服务节点的地址保存起来
 func ListenHeartbeat() {
-	//创建一个rabbitmq结构体的实例
-	r := RabbitMQ.NewRabbitMQ(os.Getenv("RABBITMQ_SERVER"))
-	defer r.Close()
-	//将这个rabbitmq绑定到apiServers这个exchange上
-	r.Bind("apiServers")
-	//返回一个消费队列消息的channel
-	msgCHAN := r.Consume()
+	//创建一个redis连接
+	rdb := RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
+	defer rdb.Client.Close()
+
+	channel := "heartbeat"
+	pubsub := rdb.Subscribe(channel)
+
 	//检查心跳消息，超时就移除数据节点
 	go removeExpiredDataServer()
-	for msg := range msgCHAN {
-		//将数据节点的地址从channal中读取出来
-		dataServerAddr, _ := strconv.Unquote(string(msg.Body))
-		//存入map中
+
+	for {
+		msg, err := pubsub.ReceiveMessage(context.Background())
+		if err != nil {
+			log.Println("redis err:", err)
+		}
+		dataServerAddr := msg.Payload
 		mutex.Lock()
 		dataServersMap[dataServerAddr] = time.Now()
 		mutex.Unlock()
