@@ -20,8 +20,7 @@ func Get(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
 	defer r.Body.Close()
-	filename := ctx.Param("id")[1:]
-	log.Println(filename)
+	filename := strings.Split(r.URL.EscapedPath(), "/")[2]
 	file := getFile(filename)
 	if file == "" {
 		w.WriteHeader(http.StatusNotFound)
