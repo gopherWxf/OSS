@@ -64,8 +64,8 @@ func InitRouter(r *gin.Engine) {
 	}
 	//temp
 	{
-		r.GET("/temp", temp.Head)
-		r.GET("/temp", temp.Put)
+		r.HEAD("/temp", temp.Head)
+		r.PUT("/temp", temp.Put)
 	}
 }
 func main() {
