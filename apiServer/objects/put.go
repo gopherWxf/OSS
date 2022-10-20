@@ -41,7 +41,9 @@ func Put(ctx *gin.Context) {
 		return
 	}
 	//获取object的名称
+
 	object := strings.Split(r.URL.EscapedPath(), "/")[2]
+
 	//给该对象增加新版本
 	err = es.AddVersion(object, hash, size)
 	if err != nil {

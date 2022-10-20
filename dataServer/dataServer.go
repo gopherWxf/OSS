@@ -16,17 +16,17 @@ func InitRouter(r *gin.Engine) {
 
 	//objects
 	{
-		r.GET("/objects", objects.Get)
-		r.DELETE("/objects", objects.Del)
+		r.GET("/objects/:name", objects.Get)
+		r.DELETE("/objects/:name", objects.Del)
 	}
 	//temp
 	{
-		r.PUT("/temp", temp.Put)
-		r.PATCH("/temp", temp.Patch)
-		r.POST("/temp", temp.Post)
-		r.DELETE("/temp", temp.Del)
-		r.HEAD("/temp", temp.Head)
-		r.GET("/temp", temp.Get)
+		r.PUT("/temp/:name", temp.Put)
+		r.PATCH("/temp/:name", temp.Patch)
+		r.POST("/temp/:name", temp.Post)
+		r.DELETE("/temp/:name", temp.Del)
+		r.HEAD("/temp/:name", temp.Head)
+		r.GET("/temp/:name", temp.Get)
 	}
 }
 
