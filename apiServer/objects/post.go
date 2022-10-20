@@ -6,6 +6,7 @@ import (
 	es "OSS/lib/ElasticSearch"
 	"OSS/lib/rs"
 	"OSS/utils"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"net/url"
@@ -13,7 +14,10 @@ import (
 	"strings"
 )
 
-func post(w http.ResponseWriter, r *http.Request) {
+func Post(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	defer r.Body.Close()
 	//获取对象名
 	object := strings.Split(r.URL.EscapedPath(), "/")[2]

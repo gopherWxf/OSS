@@ -8,6 +8,7 @@ import (
 	"OSS/utils"
 	"compress/gzip"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
@@ -16,7 +17,10 @@ import (
 	"strings"
 )
 
-func get(w http.ResponseWriter, r *http.Request) {
+func Get(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	defer r.Body.Close()
 	//获取对象名
 	object := strings.Split(r.URL.EscapedPath(), "/")[2]

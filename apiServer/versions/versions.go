@@ -14,33 +14,30 @@ package versions
 import (
 	es "OSS/lib/ElasticSearch"
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strings"
 )
 
-func Handler(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	//versions只允许GET方法
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+func Get(ctx *gin.Context) {
+	defer ctx.Request.Body.Close()
+
 	from, size := 0, 1000
 	//获取对象名
-	object := strings.Split(r.URL.EscapedPath(), "/")[2]
+	object := strings.Split(ctx.Request.URL.EscapedPath(), "/")[2]
 	for {
 		//获取元数据信息
 		metas, err := es.SearchAllVersions(object, from, size)
 		if err != nil {
 			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
+			ctx.Writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		for i := range metas {
 			bytes, _ := json.Marshal(metas[i])
-			w.Write(bytes)
-			w.Write([]byte("\n"))
+			ctx.Writer.Write(bytes)
+			ctx.Writer.Write([]byte("\n"))
 		}
 		//如果长度不等于size，说明没有更多的数据了
 		if len(metas) != size {

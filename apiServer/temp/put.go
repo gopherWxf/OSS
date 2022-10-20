@@ -5,6 +5,7 @@ import (
 	es "OSS/lib/ElasticSearch"
 	"OSS/lib/rs"
 	"OSS/utils"
+	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
@@ -12,7 +13,10 @@ import (
 	"strings"
 )
 
-func put(w http.ResponseWriter, r *http.Request) {
+func Put(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	defer r.Body.Close()
 	//获取token
 	token := strings.Split(r.URL.EscapedPath(), "/")[2]

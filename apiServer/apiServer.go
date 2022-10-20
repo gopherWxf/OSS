@@ -7,55 +7,78 @@ import (
 	"OSS/apiServer/temp"
 	"OSS/apiServer/versions"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
 )
 
-func cors(f http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")                                                            // 允许访问所有域，可以换成具体url，注意仅具体url才能带cookie信息
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token") //header的类型
-		w.Header().Add("Access-Control-Allow-Credentials", "true")                                                    //设置为true，允许ajax异步请求带cookie信息
-		w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")                             //允许请求方法
-		//w.Header().Set("content-type", "application/json;charset=UTF-8")                                              //返回数据格式是json
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusNoContent)
-			return
+func Cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		method := c.Request.Method
+		origin := c.Request.Header.Get("Origin") //请求头部
+		if origin != "" {
+			//接收客户端发送的origin （重要！）
+			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+			//服务器支持的所有跨域请求的方法
+			c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE,UPDATE")
+			//允许跨域设置可以返回其他子段，可以自定义字段
+			c.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, X-CSRF-Token, Token,session")
+			// 允许浏览器（客户端）可以解析的头部 （重要）
+			c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers")
+			//设置缓存时间
+			c.Header("Access-Control-Max-Age", "172800")
+			//允许客户端传递校验信息比如 cookie (重要)
+			c.Header("Access-Control-Allow-Credentials", "true")
 		}
-		f(w, r)
+		//允许类型校验
+		if method == "OPTIONS" {
+			c.JSON(http.StatusOK, "ok!")
+		}
+		defer func() {
+			if err := recover(); err != nil {
+				log.Printf("Panic info is: %v", err)
+			}
+		}()
+		c.Next()
 	}
 }
+func InitRouter(r *gin.Engine) {
 
+	r.Use(Cors())
+
+	//objects
+	{
+		r.PUT("/objects", objects.Put)
+		r.GET("/objects", objects.Get)
+		r.DELETE("/objects", objects.Del)
+		r.POST("/objects", objects.Post)
+	}
+	//locate
+	{
+		r.GET("/locate", locate.Get)
+	}
+	//versions
+	{
+		r.GET("/versions", versions.Get)
+	}
+	//temp
+	{
+		r.GET("/temp", temp.Head)
+		r.GET("/temp", temp.Put)
+	}
+}
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
-
 	//开始连接apiServers这个exchanges，将数据服务节点的地址保存起来
 	go heartbeat.ListenHeartbeat()
 
-	//REST接口 主要是GET和PUT
-	//http://apiServerIP/objects/<xxx>  这里的<xxx>是对象名
-	//http://apiServerIP/objects/<xxx>？version=n
-	//http.HandleFunc("/objects/", objects.Handler)
-	http.HandleFunc("/objects/", cors(objects.Handler))
-	//http.HandleFunc("/objects/", objects.Handler)
-
-	//REST接口 主要是找到<xxx>存在于哪个数据节点
-	//http://apiServerIP/locate/<xxx>   这里的<xxx>是hash值
-	http.HandleFunc("/locate/", locate.Handler)
-
-	//REST接口 主要是找到<xxx>存在于哪个数据节点
-	//http://apiServerIP/versions/ 查看所有对象的所有版本信息
-	//http://apiServerIP/versions/<xxx> 查看指定对象的所有版本信息
-	http.HandleFunc("/versions/", versions.Handler)
-
-	//REST接口 TODO
-	//http://apiServerIP/temp/<xxx>
-	http.HandleFunc("/temp/", temp.Handler)
+	r := gin.Default()
+	InitRouter(r)
 
 	fmt.Println(os.Getenv("LISTEN_ADDRESS"), "===>apiServer Start running <===")
 
 	//监听并启动 ip在tools中规划好了
 	//目前是10.29.2.1和10.29.2.2
-	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS"), nil))
+	log.Fatal(r.Run(os.Getenv("LISTEN_ADDRESS")))
 }

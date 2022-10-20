@@ -3,12 +3,16 @@ package temp
 import (
 	"OSS/lib/rs"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strings"
 )
 
-func head(w http.ResponseWriter, r *http.Request) {
+func Head(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	defer r.Body.Close()
 	token := strings.Split(r.URL.EscapedPath(), "/")[2]
 	stream, err := rs.NewRSResumablePutStreamFromToken(token)

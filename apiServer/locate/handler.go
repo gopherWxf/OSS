@@ -11,12 +11,16 @@ package locate
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
 	"strings"
 )
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func Get(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	defer r.Body.Close()
 	m := r.Method
 	if m != http.MethodGet {

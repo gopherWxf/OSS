@@ -2,13 +2,17 @@ package objects
 
 import (
 	es "OSS/lib/ElasticSearch"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-func del(w http.ResponseWriter, r *http.Request) {
+func Del(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	defer r.Body.Close()
 	//获取object的名称
 	object := strings.Split(r.URL.EscapedPath(), "/")[2]
