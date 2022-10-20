@@ -21,6 +21,10 @@ import (
 )
 
 func Get(ctx *gin.Context) {
+
+	//r := ctx.Request
+	//w := ctx.Writer
+
 	defer ctx.Request.Body.Close()
 
 	from, size := 0, 1000
