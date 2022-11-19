@@ -20,10 +20,18 @@ import (
 func Get(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
-
 	defer r.Body.Close()
-	//获取对象名
-	object := strings.Split(r.URL.EscapedPath(), "/")[2]
+
+	// 获得桶名
+	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
+	if bucket == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	// 获得对象名
+	name := strings.Split(r.URL.EscapedPath(), "/")[3]
+
+	// 获得版本号
 	versionID := r.URL.Query()["version"]
 	version := 0
 	var err error
@@ -36,7 +44,7 @@ func Get(ctx *gin.Context) {
 		}
 	}
 	//从es中获取对象的元数据
-	meta, err := es.GetMetadata(object, version)
+	meta, err := es.GetMetadata(bucket, name, version)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -49,10 +57,8 @@ func Get(ctx *gin.Context) {
 	}
 	hash := url.PathEscape(meta.Hash)
 
-	size, _ := strconv.Atoi(meta.Size)
-
 	//获取hash的读取流
-	stream, err := GetStream(hash, int64(size))
+	stream, err := GetStream(hash, meta.Size)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusNotFound)
@@ -63,7 +69,7 @@ func Get(ctx *gin.Context) {
 	//如果不为0，那么需要调用Seek将数据流跳到offset处
 	if offset != 0 {
 		stream.Seek(offset, io.SeekCurrent)
-		w.Header().Set("content-range", fmt.Sprintf("bytes%d-%d/%d", offset, size-1, size))
+		w.Header().Set("content-range", fmt.Sprintf("bytes%d-%d/%d", offset, meta.Size-1, meta.Size))
 		w.WriteHeader(http.StatusPartialContent)
 	}
 	//如果客户端想要压缩后的数据
