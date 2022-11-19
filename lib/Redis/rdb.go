@@ -32,8 +32,8 @@ func NewRedis(redisAddr string) *RDB {
 	redisClusterAddr := strings.Split(redisClusterAddrsString, ",")
 
 	client.Client = redis.NewClusterClient(&redis.ClusterOptions{
-		Addrs:    redisClusterAddr,
-		Password: os.Getenv("REDIS_PASSWORD"),
+		Addrs: redisClusterAddr,
+		//Password: os.Getenv("REDIS_PASSWORD"),
 		PoolSize: 20,
 	})
 	_, err := client.Client.Ping(context.Background()).Result()
