@@ -17,10 +17,15 @@ import (
 func Post(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
-
 	defer r.Body.Close()
-	//获取对象名
-	object := strings.Split(r.URL.EscapedPath(), "/")[2]
+	// 获得桶名
+	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
+	if bucket == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	// 获得对象的名字
+	name := strings.Split(r.URL.EscapedPath(), "/")[3]
 	//获取对象内容的大小
 	size, err := strconv.ParseInt(r.Header.Get("size"), 0, 64)
 	if err != nil {
@@ -31,13 +36,13 @@ func Post(ctx *gin.Context) {
 	//获取hash值
 	hash := utils.GetHashFromHeader(r.Header)
 	if hash == "" {
-		log.Println("missing object hash in digest header")
+		log.Println("missing name hash in digest header")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	//如果已经存在，则直接添加元数据到ES中，并返回200ok
 	if locate.Exist(url.PathEscape(hash)) {
-		err = es.AddVersion(object, hash, size)
+		err = es.AddVersion(bucket, name, hash, size)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -54,7 +59,7 @@ func Post(ctx *gin.Context) {
 		return
 	}
 	//调用rs.NewRSResumablePutStream生成数据流stream
-	stream, err := rs.NewRSResumablePutStream(dataServers, object, url.PathEscape(hash), size)
+	stream, err := rs.NewRSResumablePutStream(dataServers, name, url.PathEscape(hash), size)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
