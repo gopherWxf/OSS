@@ -19,9 +19,8 @@ var (
 )
 
 func init() {
+	available = es_server
 	go connEs()
-	// 延时5秒
-	time.Sleep(5 * time.Second)
 }
 
 // es 连接响应体
@@ -67,6 +66,8 @@ func connEs() {
 			}
 		}
 		available = result
+		// 延时5秒
+		time.Sleep(5 * time.Second)
 	}
 }
 
@@ -198,9 +199,9 @@ func GetAllBucket() []string {
 	return buckets
 }
 
-// SearchMapping 搜索映射
-func SearchMapping(name string) int {
-	url := fmt.Sprintf("http://%s/metadata_%s/_mapping", choose(available), name)
+// SearchBucket 搜索bucket
+func SearchBucket(bucket string) int {
+	url := fmt.Sprintf("http://%s/metadata_%s/_mapping", choose(available), bucket)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
