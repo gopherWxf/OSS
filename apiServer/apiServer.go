@@ -90,6 +90,12 @@ func InitRouter(r *gin.Engine) {
 	{
 		r.GET("/allVersions/*id", versions.AllGet)
 	}
+	//utils
+	{
+		r.GET("/deleteOldMetadata/*id", utils2.DelOldMetaDate)
+		r.GET("/deleteOrphanServer/*id", utils2.DelOrphan)
+		r.GET("/objectScanner/*id", utils2.ObjectScanner)
+	}
 }
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
