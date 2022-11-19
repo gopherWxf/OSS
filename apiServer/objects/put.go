@@ -28,6 +28,12 @@ func Put(ctx *gin.Context) {
 		return
 	}
 	log.Println("put hash:", hash)
+	// 获得桶名
+	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
+	if bucket == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	//获取内容的大小
 	size := utils.GetSizeFromHeader(r.Header)
 	//将hash值作为数据节点存储文件的名称，实现对象名与内容的解耦
@@ -41,12 +47,11 @@ func Put(ctx *gin.Context) {
 		w.WriteHeader(statusCode)
 		return
 	}
-	//获取object的名称
-
-	object := strings.Split(r.URL.EscapedPath(), "/")[2]
+	// 获取对象名
+	name := strings.Split(r.URL.EscapedPath(), "/")[3]
 
 	//给该对象增加新版本
-	err = es.AddVersion(object, hash, size)
+	err = es.AddVersion(bucket, name, hash, size)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
