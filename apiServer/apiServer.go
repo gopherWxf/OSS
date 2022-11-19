@@ -86,6 +86,10 @@ func InitRouter(r *gin.Engine) {
 		r.DELETE("/bucket/*id", bucket.Del)
 		r.POST("/bucket/*id", bucket.Head)
 	}
+	//allVersions
+	{
+		r.GET("/allVersions/*id", versions.AllGet)
+	}
 }
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
