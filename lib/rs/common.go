@@ -10,6 +10,6 @@ const (
 	DATA_SHARDS     = 4                             //数据片 M
 	PARITY_SHARDS   = 2                             //校验片 N
 	ALL_SHARDS      = DATA_SHARDS + PARITY_SHARDS   //所有分片
-	BLOCK_PER_SHARD = 8000                          //块碎片大小
+	BLOCK_PER_SHARD = 1310720                       //块碎片大小    1.25M*4=5M
 	BLOCK_SIZE      = BLOCK_PER_SHARD * DATA_SHARDS //块大小=数据片*块碎片大小
 )
