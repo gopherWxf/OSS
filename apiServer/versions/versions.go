@@ -14,9 +14,11 @@ package versions
 import (
 	es "OSS/lib/ElasticSearch"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -29,13 +31,14 @@ func Get(ctx *gin.Context) {
 	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
 	// 获取对象名称
 	name := strings.Split(r.URL.EscapedPath(), "/")[3]
-
+	name, _ = url.QueryUnescape(name)
+	//%E6%B5%8B%E8%AF%952
 	if bucket == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	from, size := 0, 1000
-
+	fmt.Println(name)
 	for {
 		//获取元数据信息
 		metas, err := es.SearchAllVersions(bucket, name, from, size)
