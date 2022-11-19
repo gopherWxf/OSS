@@ -2,14 +2,21 @@ package bucket
 
 import (
 	"OSS/lib/ElasticSearch"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 )
 
+// 分页结构体
+type bucketInfo struct {
+	Size int64    `json:"size"` // 数据总长度
+	Data []string `json:"data"` // 每页的数据
+}
+
+const SIZE = 4 // 每页显示条数
 func Get(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
@@ -19,20 +26,17 @@ func Get(ctx *gin.Context) {
 	// 获得桶名
 	bucket := r.Header.Get("bucket")
 
-	mapping := es.GetAllMapping()
+	buckets := es.GetAllBucket()
 
 	if bucket != "" { // 桶名不为空 则是查询单个
-		myLog.Info.Println(fmt.Sprintf("查询桶 %s", bucket))
-		unescape, _ := url.QueryUnescape(bucket)
 		var result = make([]string, 0)
-		for _, m := range mapping {
-			if strVagueQuery(unescape, m) {
-				result = append(result, m)
+		for _, curBucket := range buckets {
+			if strings.Contains(curBucket, bucket) {
+				result = append(result, curBucket)
 			}
 		}
 
 		helper := pageHelper(index, result) // 分页
-
 		marshal, _ := json.Marshal(helper)
 		w.WriteHeader(http.StatusOK)
 		w.Write(marshal)
@@ -40,11 +44,40 @@ func Get(ctx *gin.Context) {
 	}
 
 	// 否则是查询全部
-
-	helper := pageHelper(index, mapping) // 分页
+	helper := pageHelper(index, buckets) // 分页
 	marshal, _ := json.Marshal(helper)
 
-	myLog.Info.Println(fmt.Sprintf("查询全部桶，第 %d 页", index))
 	w.WriteHeader(http.StatusOK)
 	w.Write(marshal)
+}
+
+// 比较前一个字符串是否与后一个相同
+func strVagueQuery(a string, b string) bool {
+	return strings.Contains(b, a)
+}
+
+// 分页
+func pageHelper(page int, data []string) bucketInfo {
+	size := len(data)
+	info := bucketInfo{int64(size), nil}
+	if size == 0 { //如果长度为0 直接返回
+		info.Size = 0
+		return info
+	}
+
+	metadata := make([]string, 0)
+	start := (page - 1) * SIZE
+	end := page * SIZE
+	if start > len(data) {
+		fmt.Println([]int{})
+		return info
+	}
+	if len(data) < end {
+		end = len(data)
+	}
+
+	metadata = data[start:end]
+	info.Data = metadata
+
+	return info
 }
