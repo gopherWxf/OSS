@@ -4,6 +4,7 @@ import (
 	"OSS/dataServer/heartbeat"
 	"OSS/dataServer/locate"
 	"OSS/dataServer/objects"
+	"OSS/dataServer/system"
 	"OSS/dataServer/temp"
 	RedisMQ "OSS/lib/Redis"
 	utils2 "OSS/utils"
@@ -27,6 +28,10 @@ func InitRouter(r *gin.Engine) {
 		r.DELETE("/temp/*id", temp.Del)
 		r.HEAD("/temp/*id", temp.Head)
 		r.GET("/temp/*id", temp.Get)
+	}
+	//system
+	{
+		r.GET("/nodeSystemInfo/*id", system.Get)
 	}
 }
 

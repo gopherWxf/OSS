@@ -4,6 +4,7 @@ import (
 	"OSS/apiServer/heartbeat"
 	"OSS/apiServer/locate"
 	"OSS/apiServer/objects"
+	"OSS/apiServer/system"
 	"OSS/apiServer/temp"
 	"OSS/apiServer/versions"
 	RedisMQ "OSS/lib/Redis"
@@ -72,6 +73,10 @@ func InitRouter(r *gin.Engine) {
 	//headrtbeat
 	{
 		r.GET("/heartbeat", heartbeat.Get)
+	}
+	//system
+	{
+		r.GET("/nodeSystemInfo/*id", system.Get)
 	}
 }
 func main() {
