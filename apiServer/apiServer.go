@@ -69,6 +69,10 @@ func InitRouter(r *gin.Engine) {
 		r.HEAD("/temp/*id", temp.Head)
 		r.PUT("/temp/*id", temp.Put)
 	}
+	//headrtbeat
+	{
+		r.GET("/heartbeat", heartbeat.Get)
+	}
 }
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)

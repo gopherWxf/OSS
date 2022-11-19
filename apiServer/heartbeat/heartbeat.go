@@ -3,7 +3,9 @@ package heartbeat
 import (
 	"OSS/utils"
 	"context"
+	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"log"
 	"math/rand"
 	"sync"
@@ -13,6 +15,14 @@ import (
 //map key是数据节点的地址，val是时间戳
 var dataServersMap = make(map[string]time.Time)
 var mutex sync.Mutex
+
+func Get(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+	defer r.Body.Close()
+	heartbeatServers, _ := json.Marshal(dataServersMap)
+	w.Write(heartbeatServers)
+}
 
 //监听apiServers，将数据服务节点的地址保存起来
 func ListenHeartbeat() {
