@@ -136,7 +136,7 @@ func AddVersion(bucket, name, hash string, size int64) error {
 
 //用于获取某个对象，或者所有对象的，全部版本。from和size参数指定分页的显示结果
 func SearchAllVersions(bucket, name string, from, size int) ([]Metadata, error) {
-	url := fmt.Sprintf("http://%s/metadata/objects/_search?sort=name,version&from=%d&size=%d",
+	url := fmt.Sprintf("http://%s/metadata_%s/_search?sort=name,version&from=%d&size=%d",
 		choose(available), bucket, from, size)
 
 	if name != "" {
