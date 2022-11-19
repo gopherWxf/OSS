@@ -85,7 +85,7 @@ func InitRouter(r *gin.Engine) {
 		r.GET("/bucket/*id", bucket.Get)
 		r.PUT("/bucket/*id", bucket.Put)
 		r.DELETE("/bucket/*id", bucket.Del)
-		r.POST("/bucket/*id", bucket.Head)
+		r.HEAD("/bucket/*id", bucket.Head)
 	}
 	//allVersions
 	{

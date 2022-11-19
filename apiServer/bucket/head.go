@@ -12,6 +12,7 @@ func Head(ctx *gin.Context) {
 	defer r.Body.Close()
 	// 获得桶名
 	bucket := r.Header.Get("bucket")
+
 	if bucket == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
