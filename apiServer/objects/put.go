@@ -18,7 +18,6 @@ import (
 func Put(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
-
 	defer r.Body.Close()
 	//获取请求头部中内容的的hash值
 	hash := utils.GetHashFromHeader(r.Header)
