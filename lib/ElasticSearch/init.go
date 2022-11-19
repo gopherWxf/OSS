@@ -194,7 +194,9 @@ func GetAllBucket() []string {
 
 	for _, key := range keys {
 		//"metadata_"
-		buckets = append(buckets, key[9:])
+		if strings.Contains(key, "metadata_") {
+			buckets = append(buckets, key[9:])
+		}
 	}
 	return buckets
 }
