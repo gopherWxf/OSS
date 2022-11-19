@@ -1,6 +1,7 @@
 package main
 
 import (
+	"OSS/apiServer/bucket"
 	"OSS/apiServer/heartbeat"
 	"OSS/apiServer/locate"
 	"OSS/apiServer/objects"
@@ -77,6 +78,13 @@ func InitRouter(r *gin.Engine) {
 	//system
 	{
 		r.GET("/nodeSystemInfo/*id", system.Get)
+	}
+	//bucket
+	{
+		r.GET("/bucket/*id", bucket.Get)
+		r.PUT("/bucket/*id", bucket.Put)
+		r.DELETE("/bucket/*id", bucket.Del)
+		r.POST("/bucket/*id", bucket.Head)
 	}
 }
 func main() {
