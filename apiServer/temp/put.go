@@ -16,10 +16,15 @@ import (
 func Put(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
-
 	defer r.Body.Close()
+	// 获得桶名
+	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
+	if bucket == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	//获取token
-	token := strings.Split(r.URL.EscapedPath(), "/")[2]
+	token := strings.Split(r.URL.EscapedPath(), "/")[3]
 	//通过token获得RSResumablePutStream的结构体指针
 	stream, err := rs.NewRSResumablePutStreamFromToken(token)
 	if err != nil {
@@ -95,7 +100,7 @@ func Put(ctx *gin.Context) {
 				}
 			}
 			//添加进元数据es
-			err = es.AddVersion(stream.Name, realhash, stream.Size)
+			err = es.AddVersion(bucket, stream.Name, realhash, stream.Size)
 			if err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)

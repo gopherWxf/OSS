@@ -12,9 +12,9 @@ import (
 func Head(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
-
 	defer r.Body.Close()
-	token := strings.Split(r.URL.EscapedPath(), "/")[2]
+
+	token := strings.Split(r.URL.EscapedPath(), "/")[3]
 	stream, err := rs.NewRSResumablePutStreamFromToken(token)
 	if err != nil {
 		log.Println(err)
