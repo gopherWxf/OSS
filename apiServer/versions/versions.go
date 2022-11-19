@@ -44,10 +44,8 @@ func Get(ctx *gin.Context) {
 			ctx.Writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		for i := range metas {
-			bytes, _ := json.Marshal(metas[i])
-			w.Write(bytes)
-		}
+		bytes, _ := json.Marshal(metas)
+		w.Write(bytes)
 		//如果长度不等于size，说明没有更多的数据了
 		if len(metas) != size {
 			return
