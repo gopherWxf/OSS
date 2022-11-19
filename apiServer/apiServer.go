@@ -9,6 +9,7 @@ import (
 	"OSS/apiServer/temp"
 	"OSS/apiServer/versions"
 	RedisMQ "OSS/lib/Redis"
+	"OSS/tools"
 	utils2 "OSS/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -92,9 +93,9 @@ func InitRouter(r *gin.Engine) {
 	}
 	//utils
 	{
-		r.GET("/deleteOldMetadata/*id", utils2.DelOldMetaDate)
-		r.GET("/deleteOrphanServer/*id", utils2.DelOrphan)
-		r.GET("/objectScanner/*id", utils2.ObjectScanner)
+		r.GET("/deleteOldMetadata/*id", tools.DelOldMetaDate)
+		r.GET("/deleteOrphanServer/*id", tools.DelOrphan)
+		r.GET("/objectScanner/*id", tools.ObjectScanner)
 	}
 }
 func main() {

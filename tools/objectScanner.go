@@ -1,8 +1,9 @@
-package utils
+package tools
 
 import (
 	"OSS/apiServer/objects"
 	es "OSS/lib/ElasticSearch"
+	"OSS/utils"
 
 	"github.com/gin-gonic/gin"
 	"log"
@@ -47,7 +48,7 @@ func verify(realhash string) {
 			log.Println(err)
 			return
 		}
-		d := CalculateHash(stream)
+		d := utils.CalculateHash(stream)
 		if d != realhash {
 			log.Printf("object hash mismatch,calculated=%s,requested=%s\n", d, realhash)
 		}

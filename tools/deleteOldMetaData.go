@@ -1,4 +1,4 @@
-package utils
+package tools
 
 import (
 	es "OSS/lib/ElasticSearch"
