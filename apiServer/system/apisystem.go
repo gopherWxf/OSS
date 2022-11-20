@@ -1,15 +1,22 @@
 package system
 
 import (
+	"OSS/apiServer/versions"
+	es "OSS/lib/ElasticSearch"
+	RedisMQ "OSS/lib/Redis"
+	"OSS/utils"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
-func Get(ctx *gin.Context) {
+func NodeGet(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
 	defer r.Body.Close()
@@ -34,4 +41,74 @@ func Get(ctx *gin.Context) {
 	//io.Copy(w, resp.Body)
 	result, _ := ioutil.ReadAll(resp.Body)
 	w.Write(result)
+}
+
+type Info struct {
+	Obj       int64
+	Put       int64
+	Uphold    int64
+	Echarts   map[string]int64
+	Operation RedisMQ.Operation
+}
+
+func UseGet(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+	defer r.Body.Close()
+	//给Operation使用
+	index, _ := strconv.Atoi(strings.Split(r.URL.EscapedPath(), "/")[2])
+	system := Info{
+		Obj:       getObjNum(),
+		Put:       getPutNum(),
+		Uphold:    upholdNum(),
+		Echarts:   getEcharts(),
+		Operation: getOperation(index),
+	}
+
+	b, _ := json.Marshal(system)
+	w.Write(b)
+}
+func getObjNum() int64 {
+	buckets := es.GetAllBucket()
+	if len(buckets) == 0 {
+		return 0
+	}
+	var ans int64
+	for _, bucket := range buckets {
+		metas, err := versions.GetAll(bucket, "")
+		if err != nil {
+			return ans
+		}
+		ans += int64(len(metas))
+	}
+	return ans
+}
+
+func getEcharts() map[string]int64 {
+	//OssEchartsXXX-XX-XX ---> value
+	key := fmt.Sprintf("%s%d%s", "OssEcharts", time.Now().Year(), "*")
+	rdb := utils.Rds
+	return rdb.GetEcharts(key)
+}
+
+func getPutNum() int64 {
+	info := getEcharts()
+	var ans int64
+	for _, v := range info {
+		ans += v
+	}
+	return ans
+}
+
+func upholdNum() int64 {
+	//OssUpHold----->val
+	rdb := utils.Rds
+	return rdb.GetUpHoldNum("OssUpHold")
+}
+
+func getOperation(index int) RedisMQ.Operation {
+	rdb := utils.Rds
+	hash := "Operation*"
+	return rdb.GetOp(hash, index)
+	//op日期--list-->op日期时间       op日期时间--string-->op
 }

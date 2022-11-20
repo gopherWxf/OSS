@@ -78,7 +78,9 @@ func InitRouter(r *gin.Engine) {
 	}
 	//system
 	{
-		r.GET("/nodeSystemInfo/*id", system.Get)
+		r.GET("/nodeSystemInfo/*id", system.NodeGet)
+		r.GET("/systemInfo/*id", system.UseGet)
+
 	}
 	//bucket
 	{
