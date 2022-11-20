@@ -44,13 +44,12 @@ func NodeGet(ctx *gin.Context) {
 }
 
 type Info struct {
-	Obj       int64             //对象总数量     	遍历es即可
-	Put       int64             //上传请求次数   	累加Echarts
-	Uphold    int64             //维护次数    	redis string OssUpHold
-	Echarts   map[string]int64  //每日上传次数 	redis string OssEcharts年-月-日
-	Operation RedisMQ.Operation //历史维护信息
+	Obj       int64             `json:"Obj"`       //对象总数量     	遍历es即可
+	Put       int64             `json:"Put"`       //上传请求次数   	累加Echarts
+	Uphold    int64             `json:"Uphold"`    //维护次数    	redis string OssUpHold
+	Echarts   map[string]int64  `json:"Echarts"`   //每日上传次数 	redis string OssEcharts年-月-日
+	Operation RedisMQ.Operation `json:"Operation"` //历史维护信息
 	// op日期--list-->op日期时间       op日期时间--string-->op
-
 }
 
 func UseGet(ctx *gin.Context) {
@@ -60,15 +59,16 @@ func UseGet(ctx *gin.Context) {
 	//给Operation使用
 	index, _ := strconv.Atoi(strings.Split(r.URL.EscapedPath(), "/")[2])
 	system := Info{
-		Obj:       getObjNum(),
-		Put:       getPutNum(),
-		Uphold:    upholdNum(),
-		Echarts:   getEcharts(),
-		Operation: *getOperation(index),
+		Obj:     getObjNum(),
+		Put:     getPutNum(),
+		Uphold:  upholdNum(),
+		Echarts: getEcharts(),
 	}
-	fmt.Println(system.Operation)
-
+	system.Operation = *getOperation(index)
+	fmt.Println("----------->", system.Operation)
+	fmt.Printf("%+v\n", system)
 	b, _ := json.Marshal(system)
+	fmt.Println(string(b))
 	w.Write(b)
 }
 func getObjNum() int64 {

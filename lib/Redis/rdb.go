@@ -18,7 +18,7 @@ func NewRedis(redisAddr string) *RDB {
 	client := new(RDB)
 	client.Client = redis.NewClient(&redis.Options{
 		//redis访问保护
-		Addr: "101.43.17.240:6379",
+		Addr: "127.0.0.1:6379",
 
 		//Addr:     redisAddr,
 		Username: "root",
@@ -124,8 +124,8 @@ func (rdb *RDB) GetOp(hash string, idx int) *Operation {
 			onedata = append(onedata, onetime)
 		}
 		alldata := OpData{
-			data: data,
-			info: onedata,
+			Data: data,
+			Info: onedata,
 		}
 		ans.OperationData = append(ans.OperationData, alldata)
 	}
@@ -134,18 +134,18 @@ func (rdb *RDB) GetOp(hash string, idx int) *Operation {
 }
 
 type Operation struct {
-	OperationSize int64
-	OperationData []OpData
+	OperationSize int64    `json:"OperationSize"`
+	OperationData []OpData `json:"OperationData"`
 }
 
 type OpData struct {
-	data string
-	info []OpData0
+	Data string    `json:"Date"`
+	Info []OpData0 `json:"Data"`
 }
 type OpData0 struct {
-	Operation string
-	Time      string
-	Date      string
+	Operation string `json:"Operation"`
+	Time      string `json:"Time"`
+	Date      string `json:"Date"`
 }
 
 func (rdb *RDB) Incr(key string) {
