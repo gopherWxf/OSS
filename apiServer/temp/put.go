@@ -103,7 +103,7 @@ func Put(ctx *gin.Context) {
 			//添加进元数据es
 			err = es.AddVersion(bucket, stream.Name, realhash, stream.Size)
 			rdb := utils.Rds
-			rdb.Incr("OssUpHold" + time.Now().Format("2006-01-02"))
+			rdb.Incr("OssEcharts" + time.Now().Format("2006-01-02"))
 			if err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)

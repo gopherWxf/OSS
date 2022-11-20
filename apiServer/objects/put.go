@@ -58,7 +58,7 @@ func Put(ctx *gin.Context) {
 	}
 	w.WriteHeader(statusCode)
 	rdb := utils.Rds
-	rdb.Incr("OssUpHold" + time.Now().Format("2006-01-02"))
+	rdb.Incr("OssEcharts" + time.Now().Format("2006-01-02"))
 }
 
 //将body中的内容存入object流中  在客户端将内容传递给stream的同时，进行数据校验，如果不一致，则不转正，调用DELETE
