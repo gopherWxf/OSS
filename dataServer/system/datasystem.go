@@ -11,7 +11,6 @@ func Get(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
 	defer r.Body.Close()
-
 	info := system.GetInfo()
 
 	marshal, err := json.Marshal(info)
