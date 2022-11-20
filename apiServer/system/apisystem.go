@@ -64,8 +64,9 @@ func UseGet(ctx *gin.Context) {
 		Put:       getPutNum(),
 		Uphold:    upholdNum(),
 		Echarts:   getEcharts(),
-		Operation: getOperation(index),
+		Operation: *getOperation(index),
 	}
+	fmt.Println(system.Operation)
 
 	b, _ := json.Marshal(system)
 	w.Write(b)
@@ -108,7 +109,7 @@ func upholdNum() int64 {
 	return rdb.GetUpHoldNum("OssUpHold")
 }
 
-func getOperation(index int) RedisMQ.Operation {
+func getOperation(index int) *RedisMQ.Operation {
 	rdb := utils.Rds
 	hash := "op"
 	return rdb.GetOp(hash, index)
