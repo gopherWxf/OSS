@@ -4,6 +4,7 @@ import (
 	RedisMQ "OSS/lib/Redis"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"io"
 	"net/http"
 	"strconv"
@@ -37,7 +38,12 @@ func CalculateHash(r io.Reader) string {
 	//将r写入h，h会对写入的数据进行计算
 	io.Copy(h, r)
 	//h.Sum返回hash的二进制数据，用base64进行编码
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+
+	//fmt.Println("debug1:", base64.StdEncoding.EncodeToString([]byte(hex.EncodeToString(h.Sum(nil)))))
+	//CryptoJS.enc.Base64.stringify（）和正常的Base64加密之间的区别
+	//https://blog.csdn.net/qq_41385602/article/details/122982911
+	//fmt.Println("debug2:", base64.StdEncoding.EncodeToString(h.Sum(nil)))
+	return base64.StdEncoding.EncodeToString([]byte(hex.EncodeToString(h.Sum(nil))))
 }
 func GetOffsetFromHeader(h http.Header) int64 {
 	byteRange := h.Get("range")
