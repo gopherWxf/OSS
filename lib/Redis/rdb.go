@@ -16,6 +16,7 @@ type RDB struct {
 func NewRedis(redisAddr string) *RDB {
 	client := new(RDB)
 	client.Client = redis.NewClient(&redis.Options{
+		//redis访问保护
 		Addr: "101.43.17.240:6379",
 
 		//Addr:     redisAddr,
@@ -83,7 +84,7 @@ func (rdb *RDB) GetUpHoldNum(key string) int64 {
 }
 
 func (rdb *RDB) GetOp(hash string, idx int) (ans Operation) {
-	keys, err := rdb.Client.Keys(context.Background(), hash).Result()
+	keys, err := rdb.Client.Keys(context.Background(), hash+"*").Result()
 	if err != nil {
 		return
 	}
@@ -98,8 +99,9 @@ func (rdb *RDB) GetOp(hash string, idx int) (ans Operation) {
 		date := key[len(hash):]
 		onedata := make([]OpData0, 0)
 		opdatetime, _ := rdb.Client.LRange(context.Background(), key, 0, -1).Result()
-		for _, time := range opdatetime {
-			op, _ := rdb.Client.Get(context.Background(), time).Result()
+		for _, datatime := range opdatetime {
+			op, _ := rdb.Client.Get(context.Background(), datatime).Result()
+			time := datatime[len(date):]
 			onetime := OpData0{
 				Operation: op,
 				Time:      time,
@@ -130,4 +132,15 @@ type OpData0 struct {
 	Operation string
 	Time      string
 	Date      string
+}
+
+func (rdb *RDB) Incr(key string) {
+	rdb.Client.Incr(context.Background(), key)
+}
+func (rdb *RDB) InsertOp(op, date, time string) {
+	//op日期--list-->op日期时间       op日期时间--string-->op
+	opdata := op + date
+	opdatatime := op + date + time
+	rdb.Client.LPush(context.Background(), opdatatime, opdata)
+	rdb.Client.Set(context.Background(), opdatatime, op, 0)
 }

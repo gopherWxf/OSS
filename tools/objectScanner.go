@@ -4,6 +4,8 @@ import (
 	"OSS/apiServer/objects"
 	es "OSS/lib/ElasticSearch"
 	"OSS/utils"
+	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"log"
@@ -69,4 +71,10 @@ func ObjectScanner(ctx *gin.Context) {
 		verify(realhash)
 	}
 	w.WriteHeader(http.StatusOK)
+	rdb := utils.Rds
+	rdb.Incr("OssUpHold")
+	op := fmt.Sprintf("进行了对象数据全盘扫描修复的操作")
+	date := time.Now().Format("2006-01-02")
+	time := time.Now().Format("15:04:05")
+	rdb.InsertOp(op, date, time)
 }

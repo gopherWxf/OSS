@@ -2,10 +2,13 @@ package tools
 
 import (
 	es "OSS/lib/ElasticSearch"
+	"OSS/utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 /*
@@ -51,6 +54,13 @@ func DelOldMetaDate(ctx *gin.Context) {
 		}
 	}
 	w.WriteHeader(http.StatusOK)
+	rdb := utils.Rds
+	rdb.Incr("OssUpHold")
+	op := fmt.Sprintf("进行了保留对象版本操作：保留了全部对象的%d个版本", version)
+	date := time.Now().Format("2006-01-02")
+	time := time.Now().Format("15:04:05")
+	rdb.InsertOp(op, date, time)
+
 }
 func max(i, j int) int {
 	if i > j {

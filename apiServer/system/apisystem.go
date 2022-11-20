@@ -44,11 +44,13 @@ func NodeGet(ctx *gin.Context) {
 }
 
 type Info struct {
-	Obj       int64
-	Put       int64
-	Uphold    int64
-	Echarts   map[string]int64
-	Operation RedisMQ.Operation
+	Obj       int64             //对象总数量     	遍历es即可
+	Put       int64             //上传请求次数   	累加Echarts
+	Uphold    int64             //维护次数    	redis string OssUpHold
+	Echarts   map[string]int64  //每日上传次数 	redis string OssEcharts年-月-日
+	Operation RedisMQ.Operation //历史维护信息
+	// op日期--list-->op日期时间       op日期时间--string-->op
+
 }
 
 func UseGet(ctx *gin.Context) {
@@ -85,7 +87,7 @@ func getObjNum() int64 {
 }
 
 func getEcharts() map[string]int64 {
-	//OssEchartsXXX-XX-XX ---> value
+	//OssEcharts日期 ---> value
 	key := fmt.Sprintf("%s%d%s", "OssEcharts", time.Now().Year(), "*")
 	rdb := utils.Rds
 	return rdb.GetEcharts(key)
@@ -108,7 +110,7 @@ func upholdNum() int64 {
 
 func getOperation(index int) RedisMQ.Operation {
 	rdb := utils.Rds
-	hash := "Operation*"
+	hash := "op"
 	return rdb.GetOp(hash, index)
 	//op日期--list-->op日期时间       op日期时间--string-->op
 }
