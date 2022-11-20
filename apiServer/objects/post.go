@@ -66,7 +66,7 @@ func Post(ctx *gin.Context) {
 		return
 	}
 	//调用ToToken生成一个字符串token，放入Location响应头中，返回201StatusCreated
-	w.Header().Set("location", "/temp/"+url.PathEscape(stream.ToToken()))
+	w.Header().Set("location", "/temp/"+bucket+"/"+url.PathEscape(stream.ToToken()))
 	//TODO base64包含/ 而pathEscape会转化/ ,那么解析的时候怎么办呢，用	url.PathUnescape()
 	w.WriteHeader(http.StatusCreated)
 }
