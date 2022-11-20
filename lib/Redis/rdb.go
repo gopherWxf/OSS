@@ -17,7 +17,7 @@ func NewRedis(redisAddr string) *RDB {
 		Addr: "101.43.17.240:6379",
 
 		//Addr:     redisAddr,
-		//Username: "root",
+		Username: "root",
 		//Password: "123456",
 	})
 	return client
