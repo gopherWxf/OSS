@@ -31,7 +31,7 @@ func Get(ctx *gin.Context) {
 		w.WriteHeader(resp.StatusCode)
 		return
 	}
-
+	//io.Copy(w, resp.Body)
 	result, _ := ioutil.ReadAll(resp.Body)
 	w.Write(result)
 }
