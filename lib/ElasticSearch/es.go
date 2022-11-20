@@ -66,26 +66,44 @@ type searchResult struct {
 }
 
 //获取对象最新的元数据信息
-func SearchLatestVersion(bucket, name string) (meta Metadata, err error) {
-	//调用es的api，指定对象的名称，以版本号降序返回 第一个结果
-	url := fmt.Sprintf("http://%s/metadata_%s/_search?q=name:%s&size=1&sort=version:desc",
-		choose(available), bucket, url2.PathEscape(name))
+func SearchLatestVersion(mapping string, name string) (meta Metadata, e error) {
+	client := http.Client{}
+	//url := fmt.Sprintf("http://%s/metadata/_search?q=name:%s&size=1&sort=version:desc",
+	//	os.Getenv("ES_SERVER"),name)
+	url := fmt.Sprintf("http://%s/metadata_%s/_search", choose(available), mapping)
+	body := fmt.Sprintf(`
+		{
+  		  "query": {
+            "match_phrase": {
+            "name": "%s"
+            }
+          },
+          "sort": {
+          "version": {
+            "order": "desc"
+            }
+          },
+          "size": 1
+        }`, name)
+	request, _ := http.NewRequest("GET", url, strings.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.Get(url)
-	if err != nil {
+	r, e := client.Do(request)
+	if e != nil {
 		return
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		err = fmt.Errorf("fail to search latest matadata: %d", resp.StatusCode)
+
+	if r.StatusCode != http.StatusOK {
+		e = fmt.Errorf("fail to search latest metadata: %d", r.StatusCode)
 		return
 	}
-	result, _ := io.ReadAll(resp.Body)
+	result, _ := ioutil.ReadAll(r.Body)
 	var sr searchResult
 	json.Unmarshal(result, &sr)
 	if len(sr.Hits.Hits) != 0 {
 		meta = sr.Hits.Hits[0].Source
 	}
+	//log.Println(meta)
 	return
 }
 
@@ -135,20 +153,51 @@ func AddVersion(bucket, name, hash string, size int64) error {
 }
 
 //用于获取某个对象，或者所有对象的，全部版本。from和size参数指定分页的显示结果
-func SearchAllVersions(bucket, name string, from, size int) ([]Metadata, error) {
-	url := fmt.Sprintf("http://%s/metadata_%s/_search?sort=name,version&from=%d&size=%d",
-		choose(available), bucket, from, size)
-
+func SearchAllVersions(mapping string, name string, from, size int) ([]Metadata, error) {
+	client := http.Client{}
+	url := fmt.Sprintf("http://%s/metadata_%s/_search", choose(available), mapping)
+	var body string
 	if name != "" {
-		url += "&q=name:" + name
+		body = fmt.Sprintf(`
+		{
+			"query": {
+				"match_phrase": {
+					"name": "%s"
+				}
+			},
+			"sort": {
+				"version": {
+					"order": "desc"
+				}
+			},
+			"from":%d,
+			"size": %d
+		}
+		`, name, from, size)
+	} else {
+		body = fmt.Sprintf(`
+		{
+			"sort": {
+				"version": {
+					"order": "desc"
+				}
+			},
+			"from":%d,
+			"size": %d
+		}
+		`, from, size)
 	}
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
+
+	request, _ := http.NewRequest("GET", url, strings.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+
+	r, e := client.Do(request)
+	if e != nil {
+		return nil, e
 	}
-	defer resp.Body.Close()
+
 	metas := make([]Metadata, 0)
-	result, _ := io.ReadAll(resp.Body)
+	result, _ := ioutil.ReadAll(r.Body)
 	var sr searchResult
 	json.Unmarshal(result, &sr)
 	for i := range sr.Hits.Hits {
