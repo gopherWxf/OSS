@@ -12,7 +12,6 @@ import (
 	删除过期元数据的工具
 	同一对象，最多留存5个历史版本，最早的版本会被删掉
 */
-const MIN_VERSION_COUNT = 5
 
 func DelOldMetaDate(ctx *gin.Context) {
 	r := ctx.Request
@@ -45,8 +44,8 @@ func DelOldMetaDate(ctx *gin.Context) {
 		for k := range mpMax {
 			cur := mpMax[k] - mpMin[k] + 1
 			if cur > version {
-				for i := 0; i < cur-5; i++ {
-					es.DelMetadata(bucket, k, i+mpMin[k])
+				for v := mpMax[k] - version; v >= mpMin[k]; v-- {
+					es.DelMetadata(bucket, k, v)
 				}
 			}
 		}

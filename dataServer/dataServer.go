@@ -31,7 +31,7 @@ func InitRouter(r *gin.Engine) {
 	}
 	//system
 	{
-		r.GET("/nodeSystemInfo/*id", system.Get)
+		r.GET("/systemInfo", system.Get)
 	}
 }
 
