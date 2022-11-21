@@ -1,10 +1,10 @@
 package RedisMQ
 
 import (
+	"OSS/lib/golog"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	"log"
 	"sort"
 	"strconv"
 )
@@ -48,7 +48,7 @@ func NewRedis(redisAddr string) *RDB {
 func (rdb *RDB) Publish(channel string, message interface{}) {
 	err := rdb.Client.Publish(context.Background(), channel, message).Err()
 	if err != nil {
-		log.Fatal(err)
+		golog.Error.Println("redis publish err:", err)
 	}
 }
 
@@ -66,6 +66,7 @@ func (rdb *RDB) GetEcharts(patten string) (mp map[string]int64) {
 	mp = map[string]int64{}
 	keys, err := rdb.Client.Keys(context.Background(), patten).Result()
 	if err != nil {
+		golog.Error.Println("redis get string key err: ", err)
 		return
 	}
 	for _, key := range keys {
@@ -79,6 +80,7 @@ func (rdb *RDB) GetEcharts(patten string) (mp map[string]int64) {
 func (rdb *RDB) GetUpHoldNum(key string) int64 {
 	result, err := rdb.Client.Get(context.Background(), key).Result()
 	if err != nil {
+		golog.Error.Println("redis get string key err: ", err)
 		return 0
 	}
 	atoi, _ := strconv.Atoi(result)
@@ -89,6 +91,7 @@ func (rdb *RDB) GetOp(hash string, idx int) *Operation {
 	ans := &Operation{}
 	keys, err := rdb.Client.Keys(context.Background(), hash+"*").Result()
 	if err != nil {
+		golog.Error.Println("redis keys key* : ", err)
 		return ans
 	}
 	sort.Strings(keys)

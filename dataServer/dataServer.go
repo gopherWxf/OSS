@@ -9,9 +9,7 @@ import (
 	RedisMQ "OSS/lib/Redis"
 	"OSS/lib/golog"
 	utils2 "OSS/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"os"
 	"time"
 )
@@ -38,7 +36,8 @@ func InitRouter(r *gin.Engine) {
 }
 
 func main() {
-	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
+	// 实时读取日志
+	go golog.ReadLog(time.Now().Format("2006-01-02"))
 
 	utils2.Rds = RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
 	defer utils2.Rds.Client.Close()
@@ -47,16 +46,12 @@ func main() {
 	locate.CollectObjects()
 	//开始发送心跳包
 	go heartbeat.StartHeartbeat()
-	// 实时读取日志
-	go golog.ReadLog(time.Now().Format("2006-01-02"))
-	////监听来自接口服务local的GET请求,查找本地是否有这个文件,有则发送消息
-	//go locate.StartLocate()
 
 	r := gin.Default()
 	InitRouter(r)
 
-	fmt.Println(os.Getenv("LISTEN_ADDRESS"), "===>dataServer Start running <===")
+	golog.Info.Println(os.Getenv("LISTEN_ADDRESS"), "===>dataServer Start running <===")
 	//监听并启动 ip在tools中规划好了
 	//目前是10.29.1.1和10.29.1.6
-	log.Fatal(r.Run(os.Getenv("LISTEN_ADDRESS")))
+	golog.Info.Println(r.Run(os.Getenv("LISTEN_ADDRESS")))
 }

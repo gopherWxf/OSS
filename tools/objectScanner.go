@@ -3,6 +3,7 @@ package tools
 import (
 	"OSS/apiServer/objects"
 	es "OSS/lib/ElasticSearch"
+	"OSS/lib/golog"
 	"OSS/utils"
 	"fmt"
 	"time"
@@ -77,4 +78,5 @@ func ObjectScanner(ctx *gin.Context) {
 	date := time.Now().Format("2006-01-02")
 	time := time.Now().Format("15:04:05")
 	rdb.InsertOp(op, date, time)
+	golog.Trace.Println("全盘数据扫描修复")
 }

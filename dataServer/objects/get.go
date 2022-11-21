@@ -1,12 +1,12 @@
 package objects
 
 import (
+	"OSS/lib/golog"
 	"OSS/utils"
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"log"
@@ -18,13 +18,14 @@ import (
 )
 
 func Get(ctx *gin.Context) {
-	log.Println("in data server")
 	r := ctx.Request
 	w := ctx.Writer
 	defer r.Body.Close()
+
 	filename := strings.Split(r.URL.EscapedPath(), "/")[2]
 	file := getFile(filename)
 	if file == "" {
+		golog.Error.Println("url 缺少 object 名")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -40,7 +41,7 @@ func sendFile(w io.Writer, file string) {
 	//从gzipReadr读出来的数据，会被gzip先解压，然后才会被读出来
 	gzipStream, err := gzip.NewReader(f)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("gzip 解压 err：", err)
 		return
 	}
 	defer gzipStream.Close()
@@ -51,7 +52,6 @@ func sendFile(w io.Writer, file string) {
 func getFile(name string) string {
 	//查找objects目录下所有以<hash>.<X>开头的文件
 	files, _ := filepath.Glob(os.Getenv("STORAGE_ROOT") + "/objects/" + name + ".*")
-	fmt.Println(os.Getenv("STORAGE_ROOT")+"/objects/"+name+".*", len(files))
 	if len(files) != 1 {
 		return ""
 	}
@@ -63,14 +63,14 @@ func getFile(name string) string {
 	//d := url.PathEscape(base64.StdEncoding.EncodeToString(h.Sum(nil)))
 	hash := strings.Split(file, ".")[2]
 	if d != hash {
-		log.Println("object hash mismatch,remove", file)
+		golog.Error.Println("object hash mismatch,remove", file)
 		//locate.Del(hash)
 		rdb := utils.Rds
 		rdb.RemoveFile(hash, os.Getenv("LISTEN_ADDRESS"))
 
 		err := os.Remove(file)
 		if err != nil {
-			log.Println("os remove err:", err)
+			golog.Error.Println("os remove err:", err)
 		}
 		return ""
 	}

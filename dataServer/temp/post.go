@@ -6,11 +6,11 @@ package temp
 	$STORAGE_ROOT/temp/t.Uuid.dat ,用于保存临时对象内容(例如"this is test4 version 1")
 */
 import (
+	"OSS/lib/golog"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -45,7 +45,6 @@ func Post(ctx *gin.Context) {
 	//获取大小
 	size, err := strconv.ParseInt(r.Header.Get("size"), 0, 64)
 	if err != nil {
-		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -57,14 +56,14 @@ func Post(ctx *gin.Context) {
 	//将结构体的内容写入磁盘 $STORAGE_ROOT/temp/t.Uuid ,保存临时对象信息
 	err = t.writeToFile()
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("write to file", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	//创建$STORAGE_ROOT/temp/t.Uuid.dat ，用于保存临时对象内容
 	datafile, err := os.Create(os.Getenv("STORAGE_ROOT") + "/temp/" + t.Uuid + ".dat")
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("create file err: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -78,7 +77,7 @@ func Post(ctx *gin.Context) {
 func (t *tempInfo) writeToFile() error {
 	file, err := os.Create(os.Getenv("STORAGE_ROOT") + "/temp/" + t.Uuid)
 	if err != nil {
-		fmt.Println("write to file err", err, t.Uuid)
+		golog.Error.Println("write to file err", err, t.Uuid)
 		return err
 	}
 	defer file.Close()

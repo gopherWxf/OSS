@@ -4,8 +4,8 @@ package temp
 	转正，将$STORAGE_ROOT/temp/t.Uuid.dat 改为 $STORAGE_ROOT/objects/hash
 */
 import (
+	"OSS/lib/golog"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -17,7 +17,7 @@ func Put(ctx *gin.Context) {
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	tempinfo, err := readFromFile(uuid)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("read from file err: ", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -25,13 +25,13 @@ func Put(ctx *gin.Context) {
 	dataFile := infoFile + ".dat"
 	file, err := os.Open(dataFile)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("open file err: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	info, err := file.Stat()
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("read file stat err: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -40,7 +40,7 @@ func Put(ctx *gin.Context) {
 	file.Close()
 	if actual != tempinfo.Size {
 		os.Remove(dataFile)
-		log.Println("actual size mismatch,expect", tempinfo.Size, "actual", actual)
+		golog.Error.Println("actual size mismatch,expect", tempinfo.Size, "actual", actual)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -1,6 +1,7 @@
 package system
 
 import (
+	"OSS/lib/golog"
 	"OSS/lib/system"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func Get(ctx *gin.Context) {
 
 	marshal, err := json.Marshal(info)
 	if err != nil {
+		golog.Error.Println("json marshal err：", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -15,69 +15,15 @@ package locate
 		不做任何处理
 */
 import (
-	"OSS/lib/RabbitMQ"
-	"OSS/lib/types"
+	"OSS/lib/golog"
 	utils2 "OSS/utils"
 	"context"
 	"github.com/go-redis/redis/v8"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 )
-
-//监听来自接口服务local的请求,查找本地是否有这个文件,有则发送消息
-func StartLocate() {
-	//创建一个rabbitmq结构体的实例
-	r := RabbitMQ.NewRabbitMQ(os.Getenv("RABBITMQ_SERVER"))
-	defer r.Close()
-	//绑定dataServers这个exchange
-	r.Bind("dataServers")
-	//获取dataServers发来的消息的消息队列channel
-	ch := r.Consume()
-	//遍历消息队列
-	for msg := range ch {
-		//解析出object名字
-		hash, err := strconv.Unquote(string(msg.Body))
-		if err != nil {
-			panic(err)
-		}
-		//如果Locate返回！=-1,则说明本地有这个文件,则将这个消息写入dataServers
-		id := Locate(hash)
-		if id != -1 {
-			r.Send(msg.ReplyTo, types.LocateMessage{
-				Addr: os.Getenv("LISTEN_ADDRESS"),
-				Id:   id,
-			})
-		}
-	}
-}
-
-var objects = make(map[string]int)
-var mutex sync.Mutex
-
-//查看本地是否有这个文件，并且告知本节点存储的是该对象的哪个分片
-func Locate(hash string) int {
-	mutex.Lock()
-	k, ok := objects[hash]
-	mutex.Unlock()
-	if !ok {
-		return -1
-	}
-	return k
-}
-func Add(hash string, id int) {
-	mutex.Lock()
-	objects[hash] = id
-	mutex.Unlock()
-}
-func Del(hash string) {
-	mutex.Lock()
-	delete(objects, hash)
-	mutex.Unlock()
-}
 
 //第一次启动时，将所有对象存储到map
 func CollectObjects() {
@@ -89,6 +35,7 @@ func CollectObjects() {
 		//对这些文件调用filepath.Base获取基本文件名
 		file := strings.Split(filepath.Base(files[i]), ".")
 		if len(file) != 3 {
+			golog.Error.Println("read rile err")
 			panic(files[i])
 		}
 		hash := file[0]
@@ -104,8 +51,8 @@ func CollectObjects() {
 			Member: os.Getenv("LISTEN_ADDRESS"),
 		}).Err()
 		if err != nil {
-			log.Println(err)
+			golog.Error.Println("redis zadd err：", err)
 		}
-		log.Println(hash, float64(id), os.Getenv("LISTEN_ADDRESS"))
+		golog.Info.Println(hash, float64(id), os.Getenv("LISTEN_ADDRESS"))
 	}
 }

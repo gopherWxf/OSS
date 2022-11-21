@@ -4,10 +4,10 @@ package temp
 	将数据暂存下来，等待转正，并进行数据校验
 */
 import (
+	"OSS/lib/golog"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -20,7 +20,7 @@ func Patch(ctx *gin.Context) {
 	//获取临时对象的信息
 	tempinfo, err := readFromFile(uuid)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("read from file err: ", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -29,7 +29,7 @@ func Patch(ctx *gin.Context) {
 	//打开临时对象的数据文件
 	file, err := os.OpenFile(dataFile, os.O_WRONLY|os.O_APPEND, 0)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("open file err：", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -37,14 +37,14 @@ func Patch(ctx *gin.Context) {
 	//写入数据
 	_, err = io.Copy(file, r.Body)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("write file err：", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	//获取数据文件的信息
 	info, err := file.Stat()
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("get file stat err：", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -55,7 +55,7 @@ func Patch(ctx *gin.Context) {
 	if actual > tempinfo.Size {
 		os.Remove(dataFile)
 		os.Remove(infoFile)
-		log.Println("actual size", actual, "exceeds", tempinfo.Size)
+		golog.Error.Println("actual size", actual, "exceeds", tempinfo.Size)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }

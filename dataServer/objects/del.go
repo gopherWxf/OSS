@@ -1,8 +1,8 @@
 package objects
 
 import (
+	"OSS/lib/golog"
 	"OSS/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/url"
 	"os"
@@ -26,6 +26,6 @@ func Del(ctx *gin.Context) {
 
 	err := os.Rename(files[0], os.Getenv("STORAGE_ROOT")+"/garbage/"+filepath.Base(files[0]))
 	if err != nil {
-		fmt.Println("rename err", err)
+		golog.Error.Println("rename err：", err)
 	}
 }

@@ -6,6 +6,7 @@ package tools
 */
 import (
 	es "OSS/lib/ElasticSearch"
+	"OSS/lib/golog"
 	"OSS/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -64,4 +65,5 @@ func DelOrphan(ctx *gin.Context) {
 	date := time.Now().Format("2006-01-02")
 	time := time.Now().Format("15:04:05")
 	rdb.InsertOp(op, date, time)
+	golog.Trace.Println("删除无元数据引用的对象数据")
 }

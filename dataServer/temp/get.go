@@ -1,9 +1,9 @@
 package temp
 
 import (
+	"OSS/lib/golog"
 	"github.com/gin-gonic/gin"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -15,7 +15,7 @@ func Get(ctx *gin.Context) {
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	file, err := os.Open(os.Getenv("STORAGE_ROOT") + "/temp/" + uuid + ".dat")
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("open file err：", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}

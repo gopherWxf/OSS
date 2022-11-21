@@ -1,6 +1,7 @@
 package system
 
 import (
+	"OSS/lib/golog"
 	"fmt"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -45,19 +46,19 @@ type systemStatus struct {
 func GetInfo() systemStatus {
 	cpuStatus, err := getCpuInfo()
 	if err != nil {
-		//
+		golog.Error.Println("获取cpu信息失败")
 	}
 	memStatus, err := getMemInfo()
 	if err != nil {
-		//
+		golog.Error.Println("获取内存信息失败")
 	}
 	diskStatus, err := getDiskInfo()
 	if err != nil {
-		//
+		golog.Error.Println("获取硬盘分区信息失败")
 	}
 	system, err := getSystemInfo()
 	if err != nil {
-		//
+		golog.Error.Println("获取系统信息失败")
 	}
 	status := systemStatus{cpuStatus, memStatus, diskStatus, system}
 
