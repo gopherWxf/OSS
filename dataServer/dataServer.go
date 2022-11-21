@@ -7,11 +7,13 @@ import (
 	"OSS/dataServer/system"
 	"OSS/dataServer/temp"
 	RedisMQ "OSS/lib/Redis"
+	"OSS/lib/golog"
 	utils2 "OSS/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"os"
+	"time"
 )
 
 func InitRouter(r *gin.Engine) {
@@ -45,7 +47,8 @@ func main() {
 	locate.CollectObjects()
 	//开始发送心跳包
 	go heartbeat.StartHeartbeat()
-
+	// 实时读取日志
+	go golog.ReadLog(time.Now().Format("2006-01-02"))
 	////监听来自接口服务local的GET请求,查找本地是否有这个文件,有则发送消息
 	//go locate.StartLocate()
 

@@ -4,11 +4,13 @@ import (
 	"OSS/apiServer/bucket"
 	"OSS/apiServer/heartbeat"
 	"OSS/apiServer/locate"
+	"OSS/apiServer/logs"
 	"OSS/apiServer/objects"
 	"OSS/apiServer/system"
 	"OSS/apiServer/temp"
 	"OSS/apiServer/versions"
 	RedisMQ "OSS/lib/Redis"
+	"OSS/lib/golog"
 	"OSS/tools"
 	utils2 "OSS/utils"
 	"fmt"
@@ -16,6 +18,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func Cors() gin.HandlerFunc {
@@ -99,6 +102,10 @@ func InitRouter(r *gin.Engine) {
 		r.GET("/deleteOrphanServer/*id", tools.DelOrphan)
 		r.GET("/objectScanner/*id", tools.ObjectScanner)
 	}
+	//log
+	{
+		r.POST("/getLog/*id", logs.Post)
+	}
 }
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
@@ -106,8 +113,10 @@ func main() {
 	utils2.Rds = RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
 	defer utils2.Rds.Client.Close()
 
-	//开始连接apiServers这个exchanges，将数据服务节点的地址保存起来
+	// 开始连接apiServers这个exchanges，将数据服务节点的地址保存起来
 	go heartbeat.ListenHeartbeat()
+	// 实时读取日志
+	go golog.ReadLog(time.Now().Format("2006-01-02"))
 
 	r := gin.Default()
 	InitRouter(r)
