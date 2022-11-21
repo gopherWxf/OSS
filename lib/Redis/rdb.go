@@ -80,7 +80,7 @@ func (rdb *RDB) GetEcharts(patten string) (mp map[string]int64) {
 func (rdb *RDB) GetUpHoldNum(key string) int64 {
 	result, err := rdb.Client.Get(context.Background(), key).Result()
 	if err != nil {
-		golog.Error.Println("redis get string key err: ", err)
+		golog.Error.Println("redis get string key: ", key, " err: ", err)
 		return 0
 	}
 	atoi, _ := strconv.Atoi(result)
