@@ -13,8 +13,8 @@ package versions
 */
 import (
 	es "OSS/lib/ElasticSearch"
+	"OSS/lib/golog"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -32,11 +32,11 @@ func Get(ctx *gin.Context) {
 	name := strings.Split(r.URL.EscapedPath(), "/")[3]
 	//%E6%B5%8B%E8%AF%952
 	if bucket == "" {
+		golog.Error.Println("url 缺少 bucket 字段")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	from, size := 0, 1000
-	fmt.Println(name)
 	for {
 		//获取元数据信息
 		metas, err := es.SearchAllVersions(bucket, name, from, size)
@@ -49,6 +49,7 @@ func Get(ctx *gin.Context) {
 		w.Write(bytes)
 		//如果长度不等于size，说明没有更多的数据了
 		if len(metas) != size {
+			golog.Info.Println("查询对象版本信息成功")
 			return
 		}
 		from += size
@@ -61,6 +62,7 @@ func AllGet(ctx *gin.Context) {
 	// 获得桶名
 	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
 	if bucket == "" {
+		golog.Error.Println("url 缺少 bucket 字段")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

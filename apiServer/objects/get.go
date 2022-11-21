@@ -4,6 +4,7 @@ import (
 	"OSS/apiServer/heartbeat"
 	"OSS/apiServer/locate"
 	es "OSS/lib/ElasticSearch"
+	"OSS/lib/golog"
 	"OSS/lib/rs"
 	"OSS/utils"
 	"compress/gzip"
@@ -25,6 +26,7 @@ func Get(ctx *gin.Context) {
 	// 获得桶名
 	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
 	if bucket == "" {
+		golog.Error.Println("url 缺少 bucket 字段")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -36,17 +38,12 @@ func Get(ctx *gin.Context) {
 	version := 0
 	var err error
 	if len(versionID) != 0 {
-		version, err = strconv.Atoi(versionID[0])
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
+		version, _ = strconv.Atoi(versionID[0])
 	}
 	//从es中获取对象的元数据
 	meta, err := es.GetMetadata(bucket, name, version)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("es get matadata err：", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -60,7 +57,7 @@ func Get(ctx *gin.Context) {
 	//获取hash的读取流
 	stream, err := GetStream(hash, meta.Size)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("get stream err：", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -99,6 +96,7 @@ func Get(ctx *gin.Context) {
 	}
 	//GET对象时会对切实的分片进行修复，如果没有发生错误，恢复分片的写入需要用到temp接口的转正，Close方法用于将写入恢复分片转正
 	stream.Close()
+	golog.Info.Println(fmt.Sprintf("下载对象成功 桶：%s, 对象名：%s, 版本号：%d", bucket, name, version))
 }
 
 //获取object文件的读取流

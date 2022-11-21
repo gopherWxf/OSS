@@ -3,6 +3,7 @@ package temp
 import (
 	"OSS/apiServer/locate"
 	es "OSS/lib/ElasticSearch"
+	"OSS/lib/golog"
 	"OSS/lib/rs"
 	"OSS/utils"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,7 @@ func Put(ctx *gin.Context) {
 	// 获得桶名
 	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
 	if bucket == "" {
+		golog.Error.Println("url 缺少 bucket 字段")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -29,13 +31,14 @@ func Put(ctx *gin.Context) {
 	//通过token获得RSResumablePutStream的结构体指针
 	stream, err := rs.NewRSResumablePutStreamFromToken(token)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("new rs put stream err：", err)
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	//获取数据节点已经储存该对象多少数据了
 	current := stream.CurrentSize()
 	if current == -1 {
+		golog.Error.Println("put stream current size==-1")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -43,6 +46,7 @@ func Put(ctx *gin.Context) {
 	offset := utils.GetOffsetFromHeader(r.Header)
 	//如果不一致则返回错误
 	if current != offset {
+		golog.Error.Println("头部字段offset与current size不一致")
 		w.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
 		return
 	}
@@ -51,7 +55,7 @@ func Put(ctx *gin.Context) {
 	for {
 		n, err := io.ReadFull(r.Body, bytes)
 		if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
-			log.Println(err)
+			golog.Error.Println("io.ReadFull err：", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -60,7 +64,7 @@ func Put(ctx *gin.Context) {
 		if current > stream.Size {
 			//删除临时对象
 			stream.Commit(false)
-			log.Println("resumable put exceed size")
+			golog.Error.Println("总长度超出对象大小")
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
@@ -82,7 +86,7 @@ func Put(ctx *gin.Context) {
 			//如果hash值不一致，则说明数据有误，删除临时对象
 			if hash != stream.Hash {
 				stream.Commit(false)
-				log.Println("resumable put done but hash mismatch")
+				golog.Error.Println("put已完成，但计算出的hash不匹配")
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
@@ -105,9 +109,10 @@ func Put(ctx *gin.Context) {
 			rdb := utils.Rds
 			rdb.Incr("OssEcharts" + time.Now().Format("2006-01-02"))
 			if err != nil {
-				log.Println(err)
+				golog.Error.Println("es add version err：", err)
 				w.WriteHeader(http.StatusInternalServerError)
 			}
+			golog.Info.Println("上传大文件成功")
 			return
 		}
 	}

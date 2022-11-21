@@ -10,6 +10,7 @@ package locate
 */
 
 import (
+	"OSS/lib/golog"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -20,17 +21,13 @@ import (
 func Get(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
-
 	defer r.Body.Close()
-	m := r.Method
-	if m != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+
 	hash := strings.Split(r.URL.String(), "locate/")[1]
 	//查找哪台数据节点存了该hash
 	serverAddrs, err := Locate(url.PathEscape(hash))
 	if err != nil {
+		golog.Error.Println("查找哪台数据节点存了该hash出错 err：", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}

@@ -2,6 +2,7 @@ package bucket
 
 import (
 	"OSS/lib/ElasticSearch"
+	"OSS/lib/golog"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func Get(ctx *gin.Context) {
 	buckets := es.GetAllBucket()
 
 	if bucket != "" { // 桶名不为空 则是查询单个
+		golog.Info.Println("查询bucket：", bucket)
 		var result = make([]string, 0)
 		for _, curBucket := range buckets {
 			if strings.Contains(curBucket, bucket) {
@@ -44,6 +46,7 @@ func Get(ctx *gin.Context) {
 	}
 
 	// 否则是查询全部
+	golog.Info.Println("查询所有 bucket")
 	helper := pageHelper(index, buckets) // 分页
 	marshal, _ := json.Marshal(helper)
 

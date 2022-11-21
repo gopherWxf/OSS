@@ -1,12 +1,13 @@
 package heartbeat
 
 import (
+	"OSS/lib/golog"
 	"OSS/utils"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -38,13 +39,12 @@ func ListenHeartbeat() {
 	for {
 		msg, err := pubsub.ReceiveMessage(context.Background())
 		if err != nil {
-			log.Println("redis err:", err)
+			golog.Error.Println("redis pubsub err：", err)
 		}
 		dataServerAddr := msg.Payload
 		mutex.Lock()
 		dataServersMap[dataServerAddr] = time.Now()
 		mutex.Unlock()
-		//log.Println("recv data addr",dataServerAddr)
 	}
 }
 
@@ -55,7 +55,10 @@ func removeExpiredDataServer() {
 		mutex.Lock()
 		for dataServerAddr, timeStamp := range dataServersMap {
 			if timeStamp.Add(10 * time.Second).Before(time.Now()) {
+				//超时
 				delete(dataServersMap, dataServerAddr)
+				golog.Warn.Println(fmt.Sprintf("检测到 %s 节点下线", dataServerAddr))
+				//TODO 扩展-邮件通知-钉钉群通知
 			}
 		}
 		mutex.Unlock()

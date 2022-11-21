@@ -21,7 +21,7 @@ func Post(ctx *gin.Context) {
 	if len(body) != 0 {
 		err := json.Unmarshal(body, &param)
 		if err != nil {
-			golog.Error.Println(err)
+			golog.Error.Println("json Unmarshal err：", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -50,7 +50,7 @@ func getLog(param map[string]interface{}, w http.ResponseWriter) []es.Log {
 		// 如果报错
 		if err != nil {
 			// 打印错误并返回500
-			golog.Error.Println(err)
+			golog.Error.Println("es search log err：", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return result
 		}

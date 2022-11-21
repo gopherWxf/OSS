@@ -4,12 +4,12 @@ import (
 	"OSS/apiServer/heartbeat"
 	"OSS/apiServer/locate"
 	es "OSS/lib/ElasticSearch"
+	"OSS/lib/golog"
 	"OSS/lib/rs"
 	"OSS/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -23,14 +23,14 @@ func Put(ctx *gin.Context) {
 	//获取请求头部中内容的的hash值
 	hash := utils.GetHashFromHeader(r.Header)
 	if hash == "" {
-		log.Println("missing object hash in digest header")
+		golog.Error.Println("请求头中缺少digest SHA-256字段")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	log.Println("put hash:", hash)
 	// 获得桶名
 	bucket := strings.Split(r.URL.EscapedPath(), "/")[2]
 	if bucket == "" {
+		golog.Error.Println("路径参数中缺少桶名")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -39,11 +39,12 @@ func Put(ctx *gin.Context) {
 	//将hash值作为数据节点存储文件的名称，实现对象名与内容的解耦
 	statusCode, err := storeObject(r.Body, hash, size)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("store object err：", err)
 		w.WriteHeader(statusCode)
 		return
 	}
 	if statusCode != http.StatusOK {
+		golog.Error.Println("store object err：", err)
 		w.WriteHeader(statusCode)
 		return
 	}
@@ -53,12 +54,15 @@ func Put(ctx *gin.Context) {
 	//给该对象增加新版本
 	err = es.AddVersion(bucket, name, hash, size)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("es add version err：", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.WriteHeader(statusCode)
 	rdb := utils.Rds
 	rdb.Incr("OssEcharts" + time.Now().Format("2006-01-02"))
+	//url中文%xx 改utf-8格式
+	name, _ = url.QueryUnescape(name)
+	golog.Info.Println(fmt.Sprintf("上传对象 %s 成功", name))
 }
 
 //将body中的内容存入object流中  在客户端将内容传递给stream的同时，进行数据校验，如果不一致，则不转正，调用DELETE

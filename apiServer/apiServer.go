@@ -13,9 +13,7 @@ import (
 	"OSS/lib/golog"
 	"OSS/tools"
 	utils2 "OSS/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -45,7 +43,7 @@ func Cors() gin.HandlerFunc {
 		}
 		defer func() {
 			if err := recover(); err != nil {
-				log.Printf("Panic info is: %v", err)
+				golog.Error.Printf("Panic info is: %v", err)
 			}
 		}()
 		c.Next()
@@ -108,22 +106,21 @@ func InitRouter(r *gin.Engine) {
 	}
 }
 func main() {
-	log.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
+	// 实时读取日志
+	go golog.ReadLog(time.Now().Format("2006-01-02"))
 
 	utils2.Rds = RedisMQ.NewRedis(os.Getenv("REDIS_SERVER"))
 	defer utils2.Rds.Client.Close()
 
 	// 开始连接apiServers这个exchanges，将数据服务节点的地址保存起来
 	go heartbeat.ListenHeartbeat()
-	// 实时读取日志
-	go golog.ReadLog(time.Now().Format("2006-01-02"))
 
 	r := gin.Default()
 	InitRouter(r)
 
-	fmt.Println(os.Getenv("LISTEN_ADDRESS"), "===>apiServer Start running <===")
+	golog.Info.Println(os.Getenv("LISTEN_ADDRESS"), "===>apiServer Start running <===")
 
 	//监听并启动 ip在tools中规划好了
 	//目前是10.29.2.1和10.29.2.2
-	log.Fatal(r.Run(os.Getenv("LISTEN_ADDRESS")))
+	golog.Info.Println(r.Run(os.Getenv("LISTEN_ADDRESS")))
 }

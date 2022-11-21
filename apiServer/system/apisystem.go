@@ -4,12 +4,12 @@ import (
 	"OSS/apiServer/versions"
 	es "OSS/lib/ElasticSearch"
 	RedisMQ "OSS/lib/Redis"
+	"OSS/lib/golog"
 	"OSS/utils"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,23 +24,25 @@ func NodeGet(ctx *gin.Context) {
 	nodeIp := strings.Split(r.URL.EscapedPath(), "/")[2]
 	url := fmt.Sprintf("http://%s/systemInfo", nodeIp)
 	if nodeIp == "" {
+		golog.Error.Println("system info 缺少 node ip")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Println(err)
+		golog.Error.Println("system info err", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
-		log.Printf("从 %s 获取系统信息失败", nodeIp)
+		golog.Error.Println("获取系统信息失败")
 		w.WriteHeader(resp.StatusCode)
 		return
 	}
 	//io.Copy(w, resp.Body)
 	result, _ := ioutil.ReadAll(resp.Body)
 	w.Write(result)
+	golog.Info.Println(fmt.Sprintf("获取 %s 节点硬件信息成功", nodeIp))
 }
 
 type Info struct {
@@ -65,10 +67,8 @@ func UseGet(ctx *gin.Context) {
 		Echarts: getEcharts(),
 	}
 	system.Operation = *getOperation(index)
-	fmt.Println("----------->", system.Operation)
-	fmt.Printf("%+v\n", system)
+	golog.Info.Println("获取系统维护信息")
 	b, _ := json.Marshal(system)
-	fmt.Println(string(b))
 	w.Write(b)
 }
 func getObjNum() int64 {
@@ -80,6 +80,7 @@ func getObjNum() int64 {
 	for _, bucket := range buckets {
 		metas, err := versions.GetAll(bucket, "")
 		if err != nil {
+			golog.Error.Println("get all bucket err：", err)
 			return ans
 		}
 		ans += int64(len(metas))
