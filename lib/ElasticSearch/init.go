@@ -74,6 +74,9 @@ func connEs() {
 // 选取一个节点
 func choose(availableAddrs []string) string {
 	// 从可用节点中随机选取一个节点
+	for len(available) == 0 {
+		time.Sleep(1 * time.Second)
+	}
 	rand := rand.Intn(len(available))
 	client := http.Client{
 		Timeout: 3 * time.Second,
