@@ -20,10 +20,11 @@ done
 
 for i in `seq 1 6`
 do
-    mkdir -p /tmp/$i/objects
-    mkdir -p /tmp/$i/temp
-    mkdir -p /tmp/$i/garbage
+    mkdir -p /log/$i/
 done
+
+mkdir -p /log/21
+mkdir -p /log/22
 
 # 环境变量
 
