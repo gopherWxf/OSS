@@ -106,16 +106,27 @@ func SearchLog(searchParam map[string]interface{}, from int, size int) ([]Log, e
 		body = string(marshal)
 	} else {
 		body = fmt.Sprintf(`
-		{	
-			"sort": [
+		{
+		  "query": {
+			"bool": {
+			  "must": [
 				{
-					"dateTime": "desc"
+				  "match_all": {}
 				}
-			],
-			"from":%d,
-			"size": %d
+			  ],
+			  "must_not": [],
+			  "should": []
+			}
+		  },
+		  "sort": [
+			{
+			  "dateTime": "desc"
+			}
+		  ],
+		  "from": %d,
+		  "size": %d
 		}
-		`, from, size)
+`, from, size)
 	}
 	client := http.Client{}
 	url := fmt.Sprintf("http://%s/log/_search", choose(available))

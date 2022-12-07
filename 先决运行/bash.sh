@@ -36,6 +36,7 @@ export REDIS_PASSWORD=
 killall apiServer
 killall dataServer
 
+export ES_SERVER=127.0.0.1:9200
 LOG_DIRECTORY=/log/1 LISTEN_ADDRESS=10.29.1.1:12345 STORAGE_ROOT=/tmp/1 go run dataServer/dataServer.go &
 LOG_DIRECTORY=/log/2 LISTEN_ADDRESS=10.29.1.2:12345 STORAGE_ROOT=/tmp/2 go run dataServer/dataServer.go &
 LOG_DIRECTORY=/log/3 LISTEN_ADDRESS=10.29.1.3:12345 STORAGE_ROOT=/tmp/3 go run dataServer/dataServer.go &
