@@ -4,6 +4,7 @@ import (
 	es "OSS/lib/ElasticSearch"
 	"OSS/lib/golog"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
@@ -47,6 +48,10 @@ func getLog(param map[string]interface{}, w http.ResponseWriter) []es.Log {
 	for {
 		// 通过对象名 调用es包的SearchAllVersions，返回某个对象的元数据的数组
 		searchLog, err := es.SearchLog(param, from, size)
+		fmt.Println(len(searchLog), searchLog)
+		if from >= 9000 {
+			return result
+		}
 		// 如果报错
 		if err != nil {
 			// 打印错误并返回500
