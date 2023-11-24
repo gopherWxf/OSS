@@ -18,6 +18,7 @@ jobs:
           git config --global user.name 'action'
           git config --global user.email 'action@github.com'
           
+          git fetch
           git branch 
           git ls-remote --exit-code --heads https://github.com/gopherWxf/OSS
           
