@@ -27,6 +27,9 @@ jobs:
             git checkout -b "${new_branch}"
           fi
           rm -rf *
+          git add .
+          git commit -m "temp"
+          
           git merge "${{ github.ref }}"
           
           echo "666">1.txt
