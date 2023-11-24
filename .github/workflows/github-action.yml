@@ -20,6 +20,7 @@ jobs:
           
           git branch 
           git ls-remote --exit-code --heads https://github.com/gopherWxf/OSS
+          
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
           
@@ -31,8 +32,10 @@ jobs:
           
           git merge "${{ github.ref }}"
 
+          git branch 
+
           echo "666">1.txt
           
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
-          git push origin ${{ github.ref }}-go
+          git push origin ${new_branch}
