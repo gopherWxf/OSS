@@ -12,12 +12,6 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@master
-
-      - name: 设置环境 Golang 环境
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.18
-
       - name: 编译pb文件并发布到新分支
         run: |
           git config --global user.name 'action'
@@ -29,4 +23,4 @@ jobs:
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
           git tag v1.0.0
-          git push origin ${branch_name}-tag
+          git push origin --tags
