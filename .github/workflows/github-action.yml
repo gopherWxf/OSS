@@ -25,10 +25,18 @@ jobs:
           
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
+
+          if [ "$(git ls-remote --exit-code --heads https://github.com/AristeiaAI-Group/at-proto ${new_branch})" != "" ]; then
+            git checkout  "${new_branch}"
+          else
+            git checkout -b "${new_branch}"
+          fi
+          
+          
           git checkout -b "${new_branch}"
           
-          echo "444">1.txt
+          echo "555">1.txt
           
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
-          git push origin ${{ github.ref }}-go --force
+          git push origin ${{ github.ref }}-go
