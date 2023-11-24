@@ -31,11 +31,10 @@ jobs:
           else
             git checkout -b "${new_branch}"
           fi
+          rm -rf *
+          git merge "${{ github.ref }}"
           
-          
-          git checkout -b "${new_branch}"
-          
-          echo "555">1.txt
+          echo "666">1.txt
           
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
