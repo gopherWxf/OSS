@@ -23,13 +23,11 @@ jobs:
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
           
-          git checkout "${{ github.ref }}-go" 2>/dev/null || git checkout -b "${{ github.ref }}-go"
+          git checkout -b "origin/${new_branch}" 2>/dev/null || git checkout -b "${new_branch}"
           
           rm -rf *
           git add .
           git commit -m "temp"
-          
-          git checkout -b ${{ github.ref }}-go-temp
           
           git merge "${{ github.ref }}"
 
@@ -37,4 +35,4 @@ jobs:
           
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
-          git push origin ${{ github.ref }}-go-temp:${{ github.ref }}-go
+          git push origin ${{ github.ref }}-go
