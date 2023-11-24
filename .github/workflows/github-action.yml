@@ -26,6 +26,9 @@ jobs:
           rm -rf *
           git add .
           git commit -m "temp"
+          
+          git checkout -b ${{ github.ref }}-go-temp
+          
           git merge "${{ github.ref }}"
 
           echo "666">1.txt
