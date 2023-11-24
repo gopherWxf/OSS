@@ -25,13 +25,10 @@ jobs:
           
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
+          git checkout -b $new_branch
           
-          mkdir temp && mv * temp/
-          git merge origin/${new_branch}
-          git rm !(temp)
-          mv temp/* .
           echo "999">1.txt
           
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
-          git push origin ${{ github.ref }}:${{ github.ref }}-go
+          git push origin ${{ github.ref }}-go --force
