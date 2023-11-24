@@ -19,7 +19,7 @@ jobs:
           git config --global user.email 'action@github.com'
           
           git branch 
-          
+          git ls-remote --exit-code --heads https://github.com/gopherWxf/OSS
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
           
