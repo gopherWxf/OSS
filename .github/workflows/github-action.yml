@@ -18,6 +18,8 @@ jobs:
           git config --global user.name 'action'
           git config --global user.email 'action@github.com'
           
+          git branch 
+          
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
           
