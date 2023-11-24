@@ -23,8 +23,8 @@ jobs:
           
           git checkout -b "${{ github.ref }}-a" 2>/dev/null || git checkout -b "${{ github.ref }}-a"
 
-          rm -rf *
           git pull
+          rm -rf *
                   
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
