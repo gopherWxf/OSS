@@ -13,6 +13,11 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@master
 
+      - name: 设置环境 Golang 环境
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
       - name: 编译pb文件并发布到新分支
         run: |
           git config --global user.name 'action'
@@ -21,11 +26,8 @@ jobs:
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
           
-          git checkout -b "${{ github.ref }}-a" 2>/dev/null || git checkout -b "${{ github.ref }}-a"
+          echo "555">1.txt
           
-          git pull origin ${{ github.ref }}-a
-          rm -rf *
-                  
           git add .
           git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
-          git push origin ${{ github.ref }}:${{ github.ref }}-a
+          git push origin refs/heads/test:test
