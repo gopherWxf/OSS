@@ -22,7 +22,7 @@ jobs:
           new_branch="${branch_name}-go"
 
           if [ "$(git ls-remote --exit-code --heads https://github.com/gopherWxf/OSS ${{ github.ref }}-go )" != "" ]; then
-            git checkout  ${{ github.ref }}-go
+            git checkout "${new_branch}"
             rm -rf *
             git add .
             git commit -m "temp"
