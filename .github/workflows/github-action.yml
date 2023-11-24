@@ -21,7 +21,7 @@ jobs:
           branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
           new_branch="${branch_name}-go"
           
-          git checkout "${new_branch}" 2>/dev/null || git checkout -b "${new_branch}"
+          git checkout "${{ github.ref }}-go" 2>/dev/null || git checkout -b "${{ github.ref }}-go"
           
           rm -rf *
           git add .
