@@ -22,8 +22,8 @@ jobs:
           new_branch="${branch_name}-go"
           
           git checkout -b "${{ github.ref }}-a" 2>/dev/null || git checkout -b "${{ github.ref }}-a"
-
-          git pull
+          
+          git pull origin ${{ github.ref }}-a
           rm -rf *
                   
           git add .
