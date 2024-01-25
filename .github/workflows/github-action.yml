@@ -15,7 +15,6 @@ jobs:
       - name: Merge master into test
         run: |
           git branch 
-          git checkout origin/test
           git merge origin/master
       - name: 飞书提醒
         run: |
