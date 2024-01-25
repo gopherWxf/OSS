@@ -15,7 +15,6 @@ jobs:
       - name: Merge master into test
         run: |
           git merge refs/heads/master
-          git push origin test
       - name: 飞书提醒
         run: |
           if [ $? -eq 0 ]; then
