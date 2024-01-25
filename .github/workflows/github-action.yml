@@ -1,0 +1,40 @@
+name: Merge and notify
+on:
+  push:
+    branches:
+      - master
+jobs:
+  merge_and_notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Merge master into test
+        run: |
+          git checkout test
+          git merge origin/master
+          git push origin test
+      - name: 飞书提醒
+        run: |
+          if [ $? -eq 0 ]; then
+            curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+                "msg_type": "text",
+                "content": {
+                    "text": "oss test merge master success"
+                }
+            }' \
+            https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
+          else
+            curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+                "msg_type": "text",
+                "content": {
+                    "text": "oss test merge master fail"
+                }
+            }' \
+            https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
+          fi
