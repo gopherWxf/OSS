@@ -14,10 +14,13 @@ jobs:
 
       - name: Merge master
         run: |
-          git fetch origin
-          msg="oss test merge master success"
+          repository_name=$(echo ${{ env.GITHUB_REPOSITORY }} | cut -d'/' -f2)
+          echo "Repository Name: $repository_name"
           
-          git merge origin/master || msg="oss test merge master failed"
+          git fetch origin
+          msg="$repository_name merge into test from master success
+          
+          git merge origin/master || msg="$repository_name merge into test from master failed"
           git push origin test
 
           curl -X POST \
