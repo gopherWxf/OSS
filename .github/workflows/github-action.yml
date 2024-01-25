@@ -14,8 +14,9 @@ jobs:
 
       - name: Merge master
         run: |
-          msg = "oss test merge master success"
           git fetch origin
+          msg = "oss test merge master success"
+          
           git merge origin/master || msg = "oss test merge master failed"
           git push origin test
 
