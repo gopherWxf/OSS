@@ -15,7 +15,7 @@ jobs:
       - name: Merge master into test
         run: |
           echo "${{ github.ref }}"
-          git merge origin/master
+          git merge origin/test
       - name: 飞书提醒
         run: |
           if [ $? -eq 0 ]; then
