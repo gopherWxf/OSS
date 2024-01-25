@@ -14,6 +14,7 @@ jobs:
 
       - name: Merge master into test
         run: |
+          git fetch origin
           git branch 
           git merge origin/master
       - name: 飞书提醒
