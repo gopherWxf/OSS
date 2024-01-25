@@ -1,26 +1,40 @@
-name: Generate PB
-
+name: Merge and notify
 on:
   push:
-    branches-ignore:
-      - '**-go'
-
+    branches:
+      - master
 jobs:
-  build:
+  merge_and_notify:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 检出代码
-        uses: actions/checkout@master
-      - name: 编译pb文件并发布到新分支
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Merge master into test
         run: |
-          git config --global user.name 'action'
-          git config --global user.email 'action@github.com'
-          
-          branch_name=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
-          
-          echo "222">1.txt
-          git add .
-          git commit -m "Commit Message:${{ github.event.head_commit.message }}---Commit Author: ${{ github.event.head_commit.author.name }}---Make Api By Github Action"
-          git tag v1.0.1
-          git push origin --tags
+          git checkout test
+          git merge origin/master
+          git push origin test
+      - name: 飞书提醒
+        run: |
+          if [ $? -eq 0 ]; then
+            curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+                "msg_type": "text",
+                "content": {
+                    "text": "oss test merge master success"
+                }
+            }' \
+            https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
+          else
+            curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+                "msg_type": "text",
+                "content": {
+                    "text": "oss test merge master fail"
+                }
+            }' \
+            https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
+          fi
