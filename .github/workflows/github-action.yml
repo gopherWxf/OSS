@@ -16,7 +16,7 @@ jobs:
         run: |
           git fetch origin
           git branch 
-          git merge origin/master
+          git merge master
       - name: 飞书提醒
         run: |
           if [ $? -eq 0 ]; then
