@@ -12,7 +12,7 @@ jobs:
 
       - name: Merge master into test
         run: |
-          git checkout test
+          git checkout origin/test
           git merge origin/master
           git push origin test
       - name: 飞书提醒
