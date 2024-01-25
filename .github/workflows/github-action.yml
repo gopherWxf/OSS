@@ -10,7 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: refs/remotes/origin/test
+          ref: test
 
       - name: Merge master into test
         run: |
