@@ -9,12 +9,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          ref: test
 
       - name: Merge master into test
         run: |
-          echo "${{ github.ref }}"
+          git checkout origin/test
           git merge origin/master
       - name: 飞书提醒
         run: |
