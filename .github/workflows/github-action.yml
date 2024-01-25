@@ -9,10 +9,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          ref: test
 
       - name: Merge master into test
         run: |
-          git checkout origin/test
           git merge origin/master
           git push origin test
       - name: 飞书提醒
