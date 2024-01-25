@@ -16,7 +16,9 @@ jobs:
         run: |
           git fetch origin
           git branch 
-          git merge master
+          git merge origin/master
+          git push origin test
+
       - name: 飞书提醒
         run: |
           if [ $? -eq 0 ]; then
