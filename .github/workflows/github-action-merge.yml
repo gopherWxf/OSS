@@ -15,14 +15,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR")
-          echo $pr_url
+          pr_number=$(echo "$pr_url" | sed 's/.*\///')
+          
+          gh pr merge $pr_number
           
           curl -X POST \
           -H "Content-Type: application/json" \
           -d '{
               "msg_type": "text",
               "content": {
-                  "text": "'"${pr_url}"'"
+                  "text": "'"${pr_number}"'"
               }
           }' \
           https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
