@@ -14,7 +14,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git fetch origin
-          msg="at-oms merge into test from master success"
-          
           gh pr create --base test --head master --title "MR" --body "MR"
