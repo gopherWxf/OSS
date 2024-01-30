@@ -11,6 +11,8 @@ jobs:
         uses: actions/checkout@master
 
       - name: Merge master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git fetch origin
           msg="at-oms merge into test from master success"
