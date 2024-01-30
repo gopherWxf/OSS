@@ -14,7 +14,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR")
+          pr_err=""
+          pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR" || pr_err="1" )
+          if [ -n "$pr_err" ]; then
+                msg="at-oms pr创建失败，请检查"
+          
+                curl -X POST \
+                -H "Content-Type: application/json" \
+                -d '{
+                    "msg_type": "text",
+                    "content": {
+                        "text": "'"${msg}"'"
+                    }
+                }' \
+                https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
+          fi
+          
           pr_num=$(echo "$pr_url" | sed 's/.*\///')
           
           msg="at-oms merge into test from master success\n${pr_url}"
