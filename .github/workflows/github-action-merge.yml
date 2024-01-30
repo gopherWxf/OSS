@@ -1,6 +1,8 @@
 name: Merge and notify
 on:
   push:
+    branches:
+      - master
 jobs:
   merge_and_notify:
     runs-on: ubuntu-latest
