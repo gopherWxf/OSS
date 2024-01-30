@@ -17,7 +17,7 @@ jobs:
           pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR")
           pr_num=$(echo "$pr_url" | sed 's/.*\///')
           
-          msg="at-oms merge into test from master success\n${pr_url}
+          msg="at-oms merge into test from master success\n${pr_url}"
           gh pr merge $pr_num --merge || msg="at-oms merge into test from master failed\n${pr_url}"
           
           curl -X POST \
