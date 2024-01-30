@@ -17,7 +17,7 @@ jobs:
           pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR")
           pr_number=$(echo "$pr_url" | sed 's/.*\///')
           
-          gh pr merge $pr_number
+          gh pr merge $pr_number --merge
           
           curl -X POST \
           -H "Content-Type: application/json" \
