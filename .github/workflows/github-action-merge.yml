@@ -17,7 +17,7 @@ jobs:
           pr_err=""
           pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR" || pr_err="1")
           if [ -z "$pr_url" ]; then
-                msg="at-oms pr创建失败"
+                msg="at-oms pr创建失败，No commits between test and master"
           
                 curl -X POST \
                 -H "Content-Type: application/json" \
