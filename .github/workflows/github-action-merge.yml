@@ -9,24 +9,10 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@master
-        with:
-          ref: test
 
       - name: Merge master
         run: |
           git fetch origin
           msg="at-oms merge into test from master success"
           
-          git merge origin/master || msg="at-oms merge into test from master failed"
-          git push origin test
-
-          curl -X POST \
-          -H "Content-Type: application/json" \
-          -d '{
-              "msg_type": "text",
-              "content": {
-                  "text": "'"${msg}"'"
-              }
-          }' \
-          https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
-
+          gh pr create --base test --head master --title "MR" --body "MR"
