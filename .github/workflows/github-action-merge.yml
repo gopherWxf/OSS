@@ -16,8 +16,8 @@ jobs:
         run: |
           pr_err=""
           pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR" || pr_err="1")
-          if [ -n "$pr_err" ]; then
-                msg="at-oms pr创建失败，请检查"
+          if [ -z "$pr_url" ]; then
+                msg="at-oms pr创建失败"
           
                 curl -X POST \
                 -H "Content-Type: application/json" \
@@ -41,7 +41,7 @@ jobs:
           -d '{
               "msg_type": "text",
               "content": {
-                  "text": "'"${pr_url}"'"
+                  "text": "'"${msg}"'"
               }
           }' \
           https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
