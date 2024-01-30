@@ -14,4 +14,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh pr create --base test --head master --title "MR" --body "MR"
+          pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR")
+          echo $pr_url
