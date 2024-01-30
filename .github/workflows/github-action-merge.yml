@@ -17,14 +17,15 @@ jobs:
           pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR")
           pr_num=$(echo "$pr_url" | sed 's/.*\///')
           
-          gh pr merge $pr_num --merge
+          msg="at-oms merge into test from master success\n${pr_url}"
+          gh pr merge $pr_num --merge || msg="at-oms 11merge into test from master failed\n${pr_url}"
           
           curl -X POST \
           -H "Content-Type: application/json" \
           -d '{
               "msg_type": "text",
               "content": {
-                  "text": "'"${pr_url}"'"
+                  "text": "'"${msg}"'"
               }
           }' \
           https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
