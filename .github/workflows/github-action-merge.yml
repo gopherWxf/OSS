@@ -15,7 +15,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           pr_err=""
-          pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR")
+          pr_url=$(gh pr create --base test --head master --title "Action PR" --body "Action PR" || pr_err="1")
           if [ -n "$pr_err" ]; then
                 msg="at-oms pr创建失败，请检查"
           
