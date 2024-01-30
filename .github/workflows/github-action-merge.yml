@@ -41,7 +41,7 @@ jobs:
           -d '{
               "msg_type": "text",
               "content": {
-                  "text": "'"${pr_err}"'"
+                  "text": "'"${pr_url}"'"
               }
           }' \
           https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
