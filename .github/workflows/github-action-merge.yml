@@ -28,6 +28,7 @@ jobs:
                     }
                 }' \
                 https://open.feishu.cn/open-apis/bot/v2/hook/f75f0d28-a103-43a6-a0dd-797b111b4498
+                exit 0
           fi
           
           pr_num=$(echo "$pr_url" | sed 's/.*\///')
